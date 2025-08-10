@@ -41,8 +41,8 @@ interface UnitGrowths {
 }
 
 enum UnitStatus {
-    Stunned,
-    Poisoned,
-    Slowed,
-    Hastened
+    STUN,
+    POISON,
+    SLOW,
+    HASTE
 }

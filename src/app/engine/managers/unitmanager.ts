@@ -26,5 +26,13 @@ class UnitManager {
         }
     }
 
+    getUnitById(id: string) {
+
+    }
+
+    getUnitIdAtPosition(x: number, y: number) {
+        
+    }
+
     
 }
