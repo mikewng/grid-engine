@@ -1,15 +1,5 @@
-class UnitManager {
+export class UnitManager {
     private units: Map<string, Unit> = new Map();
-
-    /**
-     * TODO
-     * - Add Unit(s)
-     * - Remove Unit(s)
-     * - Move Unit
-     * - Get Unit by ID
-     * - Get Units by Faction
-     * - Get Unit at XY position
-     */
 
     addUnit(unit: Unit) {
         this.units.set(unit.id, unit);
@@ -19,20 +9,23 @@ class UnitManager {
         this.units.delete(id);
     }
 
-    moveUnit(id: string, x: number, y: number) {
+    getUnitById(id: string) {
+        return this.units.get(id) ?? undefined;
+    }
+
+    getUnitIdAtPosition(x: number, y: number) {
+        return this.units.values().find(unit => unit.position.x === x && unit.position.y === y) ?? undefined;
+    }
+
+    getUnitsByFaction(factionType: UnitFaction) {
+        return this.units.values().filter(unit => unit.unitFaction === factionType) ?? undefined;
+    }
+
+    setUnitPosition(id: string, x: number, y: number) {
         const unit = this.units.get(id);
         if (unit) {
             unit.position = { x, y }
         }
     }
-
-    getUnitById(id: string) {
-
-    }
-
-    getUnitIdAtPosition(x: number, y: number) {
-        
-    }
-
     
 }

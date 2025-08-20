@@ -1,4 +1,5 @@
 interface Grid {
-    size: number;
-    gridcontent: Tile[][]
+    height: number;
+    width: number;
+    gridcontent: Tile[][];
 }

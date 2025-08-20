@@ -12,6 +12,7 @@ interface Unit {
     isAlive: boolean;
     hasActed: boolean;
     status: UnitStatus;
+    unitFaction: UnitFaction;
 }
 
 interface UnitStats {
@@ -45,4 +46,11 @@ enum UnitStatus {
     POISON,
     SLOW,
     HASTE
+}
+
+enum UnitFaction {
+    P1,
+    P2,
+    ENEMY,
+    NEUTRAL
 }
