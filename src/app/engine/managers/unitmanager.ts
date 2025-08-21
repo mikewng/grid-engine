@@ -1,7 +1,9 @@
 export class UnitManager {
     private units: Map<string, Unit> = new Map();
 
-    addUnit(unit: Unit) {
+
+    // BASIC CRUD
+    setUnit(unit: Unit) {
         this.units.set(unit.id, unit);
     }
 
@@ -21,11 +23,22 @@ export class UnitManager {
         return this.units.values().filter(unit => unit.unitFaction === factionType) ?? undefined;
     }
 
+    getUnitStats(id: string) {
+        return this.units.get(id)?.stats;
+    }
+
     setUnitPosition(id: string, x: number, y: number) {
         const unit = this.units.get(id);
         if (unit) {
             unit.position = { x, y }
         }
     }
-    
+
+    patchUnit(id: string, changes: Partial<Unit>) {
+        const unit = this.getUnitById(id);
+        if (!unit) return false;
+        this.setUnit({ ...unit, ...changes })
+    }
+
+    // BUSINESS LOGIC
 }
