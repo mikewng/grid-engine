@@ -2,7 +2,7 @@ interface Tile {
     type: TileType;
     x: number;
     y: number;
-    occupiedBy?: string;
+    occupiedByUnitId?: string;
     movementCost: number;
 }
 
