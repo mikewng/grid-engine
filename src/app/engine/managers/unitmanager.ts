@@ -1,18 +1,24 @@
+import { Result } from "../utils/resultclass";
+
 export class UnitManager {
     private units: Map<string, Unit> = new Map();
 
 
     // BASIC CRUD
-    setUnit(unit: Unit) {
+    setUnit(unit: Unit): Result<boolean> {
         this.units.set(unit.id, unit);
+        return Result.Success(true)
     }
 
-    removeUnit(id: string) {
+    removeUnit(id: string): Result<boolean> {
         this.units.delete(id);
+        return Result.Success(true)
     }
 
-    getUnitById(id: string) {
-        return this.units.get(id) ?? undefined;
+    getUnitById(id: string): Result<Unit> {
+        const unit = this.units.get(id)
+        if (!unit) return Result.Fail("Could not find unit by given ID.")
+        return Result.Success(unit);
     }
 
     getUnitIdAtPosition(x: number, y: number) {
@@ -34,10 +40,12 @@ export class UnitManager {
         }
     }
 
-    patchUnit(id: string, changes: Partial<Unit>) {
+    patchUnit(id: string, changes: Partial<Unit>): Result<Unit> {
         const unit = this.getUnitById(id);
-        if (!unit) return false;
-        this.setUnit({ ...unit, ...changes })
+        if (!unit.value) return Result.Fail("Could not find unit by given ID.");
+        this.setUnit({ ...unit.value, ...changes })
+
+        return Result.Success(unit.value)
     }
 
     // BUSINESS LOGIC
