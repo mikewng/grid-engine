@@ -37,6 +37,10 @@ export class CombatManager {
         // Calculate thresholds for double hit
     }
 
+    calculateCritHit(critrate: number) {
+        // Roll RNG based off of critrate (%)
+    }
+
     calculateHasHit(hitrate: number) {
         // Roll RNG based off of hitrate (%)
     }
