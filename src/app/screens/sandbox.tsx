@@ -1,3 +1,6 @@
+import GridComponent from "../components/gridcomponent";
+import "./sandbox.scss"
+
 const SandboxScreen = () => {
     return (
         <div className="ge-sandbox-wrapper">
