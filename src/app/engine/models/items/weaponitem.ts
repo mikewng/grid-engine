@@ -2,6 +2,8 @@ interface WeaponItem extends Item {
     attack: number;
     weaponType: WeaponType;
     range: number;
+    baseHitRate: number;
+    baseCritRate: number;
 }
 
 enum WeaponType {

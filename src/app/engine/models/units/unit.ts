@@ -7,6 +7,7 @@ interface Unit {
     stats: UnitStats;
     growths: UnitGrowths;
     skills: UnitSkill[]
+    equippedWeapon: WeaponItem;
     items: Item[]
     range: number;
     isAlive: boolean;
