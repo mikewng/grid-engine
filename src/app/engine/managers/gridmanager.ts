@@ -7,13 +7,8 @@ export class GridManager {
     private grid: Grid | null = null;
 
     // Generic Functions
-    buildGridfromArr() {
-
-    }
-
-    // Grid Specific Functions
-    setGridSize(height: number, width: number) {
-
+    buildGridfromArr(): Result<boolean> {
+        return Result.Fail("Not Implemented Error")
     }
 
     getGrid(): Result<Grid> {
@@ -39,7 +34,7 @@ export class GridManager {
     // Tile Specific Functions
     getTileAtPosition(x: number, y: number): Result<Tile> {
         if (!this.grid) return Result.Fail("Grid has not been initialized");
-        
+
         if (x < 0 || x >= this.grid.width || y < 0 || y >= this.grid.height) {
             return Result.Fail(`Position (${x}, ${y}) is out of bounds`);
         }
@@ -50,7 +45,7 @@ export class GridManager {
 
     getTilesByType(tileType: TileType): Result<Tile[]> {
         if (!this.grid) return Result.Fail("Grid has not been initialized");
-        
+
         const tiles: Tile[] = [];
         for (let y = 0; y < this.grid.height; y++) {
             for (let x = 0; x < this.grid.width; x++) {
@@ -65,7 +60,7 @@ export class GridManager {
 
     getOccupiedTiles(): Result<Tile[]> {
         if (!this.grid) return Result.Fail("Grid has not been initialized");
-        
+
         const occupiedTiles: Tile[] = [];
         for (let y = 0; y < this.grid.height; y++) {
             for (let x = 0; x < this.grid.width; x++) {
@@ -80,7 +75,7 @@ export class GridManager {
 
     getEmptyTiles(): Result<Tile[]> {
         if (!this.grid) return Result.Fail("Grid has not been initialized");
-        
+
         const emptyTiles: Tile[] = [];
         for (let y = 0; y < this.grid.height; y++) {
             for (let x = 0; x < this.grid.width; x++) {
@@ -95,7 +90,7 @@ export class GridManager {
 
     getAllTiles(): Result<Tile[]> {
         if (!this.grid) return Result.Fail("Grid has not been initialized");
-        
+
         const allTiles: Tile[] = [];
         for (let y = 0; y < this.grid.height; y++) {
             for (let x = 0; x < this.grid.width; x++) {
@@ -107,7 +102,7 @@ export class GridManager {
 
     isValidPosition(x: number, y: number): Result<boolean> {
         if (!this.grid) return Result.Fail("Grid has not been initialized");
-        
+
         const isValid = x >= 0 && x < this.grid.width && y >= 0 && y < this.grid.height;
         return Result.Success(isValid);
     }

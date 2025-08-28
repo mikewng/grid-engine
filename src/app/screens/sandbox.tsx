@@ -11,7 +11,7 @@ const SandboxScreen = () => {
     // Create a 10x10 grass grid
     const testGrid = useMemo(() => {
         const width = 10;
-        const height = 10;
+        const height = 15;
         const gridContent: Tile[][] = [];
 
         // Generate 10x10 grid of grass tiles
