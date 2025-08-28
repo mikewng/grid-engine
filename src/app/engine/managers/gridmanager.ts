@@ -1,3 +1,6 @@
+import { Grid } from "../models/grid/grid";
+import { TileType } from "../models/grid/itile";
+import { Tile } from "../models/grid/tile";
 import { Result } from "../utils/resultclass";
 
 export class GridManager {
