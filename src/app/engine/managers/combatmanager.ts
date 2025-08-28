@@ -115,8 +115,14 @@ export class CombatManager {
     calculateHitRate(attacker: Unit, defender: Unit): number {
         // Calculate hit rate for unit
         // Formula: (base hit rate + skill stat*2 and luck/2) - (speed + luck)
-        return ((attacker.equippedWeapon.baseHitRate) + (attacker.stats.skill * 2) + (attacker.stats.luck / 2)) -
-            ((defender.stats.speed * 2) + defender.stats.luck)
+        if (attacker.equippedWeapon?.baseHitRate) {
+            return ((attacker.equippedWeapon.baseHitRate) + (attacker.stats.skill * 2) + (attacker.stats.luck / 2)) -
+                ((defender.stats.speed * 2) + defender.stats.luck);
+        } else {
+            return ((attacker.stats.skill * 2) + (attacker.stats.luck / 2)) -
+                ((defender.stats.speed * 2) + defender.stats.luck);
+        }
+
     }
 
     calculateDoubleHit(attacker: Unit, defender: Unit): boolean {
@@ -129,7 +135,11 @@ export class CombatManager {
     calculateCritRate(unit: Unit): number {
         // Calculate critical hit rate based on skill stat
         // Formula: skill / 2 + weapon crit 
-        return (unit.stats.skill / 2) + unit.equippedWeapon.baseCritRate; // Common Fire Emblem formula
+        if (unit.equippedWeapon?.baseCritRate) {
+            return (unit.stats.skill / 2) + unit.equippedWeapon.baseCritRate;
+        } else {
+            return (unit.stats.skill / 2);
+        }
     }
 
     calculateHasHit(hitrate: number): boolean {
@@ -145,7 +155,11 @@ export class CombatManager {
     canCounterAttack(defender: Unit, attacker: Unit): boolean {
         // Check if defender can counter attack based on range, weapon type, etc.
         // For now, simple implementation - defender can counter if they have a weapon
-        return defender.items.length > 0 && defender.stats.health > 0;
+        if (defender.equippedWeapon && attacker.equippedWeapon) {
+            return defender.equippedWeapon.range >= attacker.equippedWeapon?.range
+        } else {
+            return false;
+        }
     }
 
     calculateDamage(attacker: Unit, defender: Unit): number {
