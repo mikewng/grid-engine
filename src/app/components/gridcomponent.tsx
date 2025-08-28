@@ -3,6 +3,8 @@ import { Grid } from "../engine/models/grid/grid";
 import { Tile } from "../engine/models/grid/tile";
 import TileComponent from "./tilecomponent";
 
+import "./gridcomponent.scss"
+
 interface GridProps {
     grid: Grid;
     onTileClick?: (tile: Tile) => void;

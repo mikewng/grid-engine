@@ -2,6 +2,8 @@ import React, { memo, useMemo } from "react";
 import { Tile } from "../engine/models/grid/tile";
 import { TileType } from "../engine/models/grid/itile";
 
+import "./tilecomponent.scss"
+
 interface TileProps {
     tile: Tile;
     onClick?: (tile: Tile) => void;
@@ -40,7 +42,7 @@ const TileComponent: React.FC<TileProps> = memo(({
         aspectRatio: '1',
         minHeight: '40px',
         cursor: onClick ? 'pointer' : 'default',
-        transition: 'all 0.15s ease-in-out'
+        transition: 'all 0.15s ease-in-out',
     }), [onClick]);
 
     return (
