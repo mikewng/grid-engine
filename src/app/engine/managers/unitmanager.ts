@@ -52,11 +52,6 @@ export class UnitManager {
         return Result.Success(activeUnits);
     }
 
-    getUnitsByStatus(status: UnitStatus): Result<Unit[]> {
-        const units = Array.from(this.units.values()).filter(unit => unit.status === status);
-        return Result.Success(units);
-    }
-
     setUnitPosition(id: string, x: number, y: number): Result<boolean> {
         const unit = this.units.get(id);
         if (unit) {

@@ -1,25 +1,25 @@
 interface Unit {
-    id: string;
-    unitTypeId: string;
+    readonly id: string;
+    readonly unitTypeId: string;
     name: string;
     position: { x: number, y: number }
     unitClass: UnitClass;
     stats: UnitStats;
     growths: UnitGrowths;
-    skills: UnitSkill[]
+    skills: UnitSkill[];
     equippedWeapon: WeaponItem | undefined;
     items: Item[]
     range: number;
-    movement: number;
     isAlive: boolean;
     hasActed: boolean;
-    status: UnitStatus;
+    statusEffects: UnitStatusEffect[];
     unitFaction: UnitFaction;
 }
 
 interface UnitStats {
     level: number;
-    health: number;
+    currentHealth: number;
+    maxHealth: number;
     strength: number;
     magic: number;
     skill: number;
@@ -43,7 +43,15 @@ interface UnitGrowths {
     movementGR: number;
 }
 
-enum UnitStatus {
+interface UnitStatusEffect {
+    type: UnitStatusType,
+    duration: number;
+    instensity: number;
+}
+
+
+
+enum UnitStatusType {
     STUN,
     POISON,
     SLOW,

@@ -52,7 +52,7 @@ export class CombatManager {
 
             // Check if defender died
             const updatedDefender = this.units.getUnitById(def_id);
-            if (updatedDefender.success && updatedDefender.value!.stats.health <= 0) {
+            if (updatedDefender.success && updatedDefender.value!.stats.currentHealth <= 0) {
                 combatResult.defenderKilled = true;
                 return Result.Success(combatResult);
             }
@@ -68,7 +68,7 @@ export class CombatManager {
 
                 // Check if attacker died
                 const updatedAttacker = this.units.getUnitById(atk_id);
-                if (updatedAttacker.success && updatedAttacker.value!.stats.health <= 0) {
+                if (updatedAttacker.success && updatedAttacker.value!.stats.currentHealth <= 0) {
                     combatResult.attackerKilled = true;
                     return Result.Success(combatResult);
                 }
@@ -86,7 +86,7 @@ export class CombatManager {
 
                 // Check if defender died from second attack
                 const updatedDefender = this.units.getUnitById(def_id);
-                if (updatedDefender.success && updatedDefender.value!.stats.health <= 0) {
+                if (updatedDefender.success && updatedDefender.value!.stats.currentHealth <= 0) {
                     combatResult.defenderKilled = true;
                     return Result.Success(combatResult);
                 }
@@ -103,7 +103,7 @@ export class CombatManager {
 
                 // Check if attacker died from defender's second attack
                 const updatedAttacker = this.units.getUnitById(atk_id);
-                if (updatedAttacker.success && updatedAttacker.value!.stats.health <= 0) {
+                if (updatedAttacker.success && updatedAttacker.value!.stats.currentHealth <= 0) {
                     combatResult.attackerKilled = true;
                 }
             }
@@ -179,12 +179,12 @@ export class CombatManager {
         const unit = this.units.getUnitById(id);
         if (!unit.success || !unit.value) return false;
 
-        const currentHp = unit.value.stats.health;
+        const currentHp = unit.value.stats.currentHealth;
         const newHp = currentHp - dmg;
         if (newHp <= 0) {
-            this.units.patchUnit(id, { stats: { ...unit.value.stats, health: 0 } })
+            this.units.patchUnit(id, { stats: { ...unit.value.stats, currentHealth: 0 } })
         } else {
-            this.units.patchUnit(id, { stats: { ...unit.value.stats, health: newHp } })
+            this.units.patchUnit(id, { stats: { ...unit.value.stats, currentHealth: newHp } })
         }
     }
 
