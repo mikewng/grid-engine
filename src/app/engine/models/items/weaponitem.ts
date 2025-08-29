@@ -1,4 +1,6 @@
-interface WeaponItem extends Item {
+import { Item } from "./item";
+
+export interface WeaponItem extends Item {
     attack: number;
     weaponType: WeaponType;
     range: number;
@@ -6,7 +8,7 @@ interface WeaponItem extends Item {
     baseCritRate: number;
 }
 
-enum WeaponType {
+export enum WeaponType {
     SWORD,
     AXE,
     SPEAR,

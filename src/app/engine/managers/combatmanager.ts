@@ -1,5 +1,6 @@
 import { UnitManager } from "./unitmanager";
 import { Result } from "../utils/resultclass";
+import { Unit } from "../models/units/unit";
 
 interface CombatResult {
     attackerDamageDealt: number;

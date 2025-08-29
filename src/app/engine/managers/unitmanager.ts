@@ -1,3 +1,4 @@
+import { Unit, UnitFaction, UnitStats } from "../models/units/unit";
 import { Result } from "../utils/resultclass";
 
 export class UnitManager {

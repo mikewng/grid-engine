@@ -8,6 +8,7 @@ import {
     MovementTracker,
     GridMutator
 } from "./interfaces/movement-interfaces";
+import { Unit } from "../models/units/unit";
 
 export class MovementManager {
     constructor(

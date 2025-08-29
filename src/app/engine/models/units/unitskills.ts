@@ -1,4 +1,4 @@
-interface UnitSkill {
+export interface UnitSkill {
     id: string;
     skillTypeId: string;
     name: string;

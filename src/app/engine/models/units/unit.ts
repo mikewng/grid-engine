@@ -1,4 +1,9 @@
-interface Unit {
+import { Item } from "../items/item";
+import { WeaponItem } from "../items/weaponitem";
+import { UnitClass } from "./unitclass";
+import { UnitSkill } from "./unitskills";
+
+export interface Unit {
     readonly id: string;
     readonly unitTypeId: string;
     name: string;
@@ -16,7 +21,7 @@ interface Unit {
     unitFaction: UnitFaction;
 }
 
-interface UnitStats {
+export interface UnitStats {
     level: number;
     currentHealth: number;
     maxHealth: number;
@@ -30,7 +35,7 @@ interface UnitStats {
     movement: number;
 }
 
-interface UnitGrowths {
+export interface UnitGrowths {
     levelGR: number;
     healthGR: number;
     strengthGR: number;
@@ -43,7 +48,7 @@ interface UnitGrowths {
     movementGR: number;
 }
 
-interface UnitStatusEffect {
+export interface UnitStatusEffect {
     type: UnitStatusType,
     duration: number;
     instensity: number;
@@ -51,14 +56,14 @@ interface UnitStatusEffect {
 
 
 
-enum UnitStatusType {
+export enum UnitStatusType {
     STUN,
     POISON,
     SLOW,
     HASTE
 }
 
-enum UnitFaction {
+export enum UnitFaction {
     P1,
     P2,
     ENEMY,
