@@ -76,4 +76,11 @@ export class UnitManager {
     }
 
     // BUSINESS LOGIC
+    markUnitActed(id: string): Result<Unit> {
+        const unit = this.getUnitById(id);
+        if (!unit.value) return Result.Fail("Could not find unit by given ID.");
+        this.setUnit({ ...unit.value, hasActed: true })
+
+        return Result.Success(unit.value)
+    }
 }

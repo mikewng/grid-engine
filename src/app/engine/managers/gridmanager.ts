@@ -1,3 +1,4 @@
+import { Coordinate } from "../models/grid/coordinate";
 import { Grid } from "../models/grid/grid";
 import { TileType } from "../models/grid/itile";
 import { Tile } from "../models/grid/tile";
@@ -40,6 +41,19 @@ export class GridManager {
         }
 
         const tile = this.grid.gridcontent[y][x];
+        return Result.Success(tile);
+    }
+
+    setTileAtPosition(x: number, y: number, tileType: TileType): Result<Tile> {
+        if (!this.grid) return Result.Fail("Grid has not been initialized");
+
+        if (x < 0 || x >= this.grid.width || y < 0 || y >= this.grid.height) {
+            return Result.Fail(`Position (${x}, ${y}) is out of bounds`);
+        }
+
+        const tile = this.grid.gridcontent[y][x];
+        this.grid.gridcontent[y][x].type = tileType;
+
         return Result.Success(tile);
     }
 
@@ -105,6 +119,29 @@ export class GridManager {
 
         const isValid = x >= 0 && x < this.grid.width && y >= 0 && y < this.grid.height;
         return Result.Success(isValid);
+    }
+
+
+    // Business Logic
+    isTileOccupied(x: number, y: number): Result<boolean> {
+        if (!this.grid) return Result.Fail("Grid has not been initialized");
+
+        const tile = this.getTileAtPosition(x, y);
+        if (!tile.value || !tile.success) {
+            return Result.Fail("Could not find the tile at given position.");
+        }
+
+        if (tile.value.occupiedByUnitId) {
+            return Result.Success(true);
+        } else {
+            return Result.Success(false);
+        }
+    }
+
+    // TO BE IMPLEMENTED
+    moveUnitOnGrid(unit: Unit, x: number, y: number): Result<Coordinate> {
+        if (!this.grid) return Result.Fail("Grid has not been initialized");
+        return Result.Fail("not implemented");
     }
 
 }

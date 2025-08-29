@@ -10,6 +10,7 @@ interface Unit {
     equippedWeapon: WeaponItem | undefined;
     items: Item[]
     range: number;
+    movement: number;
     isAlive: boolean;
     hasActed: boolean;
     status: UnitStatus;
