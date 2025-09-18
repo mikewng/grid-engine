@@ -1,9 +1,10 @@
 import { MovementTracker } from "../interfaces/movement-interfaces";
 import { Result } from "../../utils/resultclass";
+import { Unit } from "../../models/units/unit";
 
 export class BasicMovementTracker implements MovementTracker {
     initializeBudget(unit: Unit): number {
-        return unit.movement;
+        return unit.stats.movement;
     }
 
     consumeBudget(current: number, cost: number): Result<number> {

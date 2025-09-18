@@ -2,6 +2,7 @@ import { Coordinate } from "../../models/grid/coordinate";
 import { GridManager } from "../gridmanager";
 import { GridMutator } from "../interfaces/movement-interfaces";
 import { Result } from "../../utils/resultclass";
+import { Unit } from "../../models/units/unit";
 
 export class BasicGridMutator implements GridMutator {
     constructor(private gridManager: GridManager) {}

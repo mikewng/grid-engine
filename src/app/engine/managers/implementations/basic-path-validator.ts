@@ -2,6 +2,7 @@ import { Coordinate } from "../../models/grid/coordinate";
 import { GridManager } from "../gridmanager";
 import { PathValidator } from "../interfaces/movement-interfaces";
 import { Result } from "../../utils/resultclass";
+import { Unit } from "../../models/units/unit";
 
 export class BasicPathValidator implements PathValidator {
     constructor(private gridManager: GridManager) {}

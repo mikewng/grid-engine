@@ -1,4 +1,5 @@
 import { ITile } from "../../models/grid/itile";
+import { Unit } from "../../models/units/unit";
 import { MovementCostCalculator } from "../interfaces/movement-interfaces";
 
 export class BasicMovementCostCalculator implements MovementCostCalculator {
