@@ -10,7 +10,7 @@ Currently, I am modeling its gameplay structure and loop based off of series suc
 - engine/ - Core logic of the game engine
   - managers/ - CRUD level management of specific game objects
   - models/ - Interfaced models and implementations of game objects
-- utils/ - Pure functions used across all layers
+- utils/ - Pure functions used across all layers, also contains default game rules that can be swapped for differentcustom implementations
 - screens/ - UI Screens for the game, including a sandbox test page
 
 # Engine Models and Relationships
