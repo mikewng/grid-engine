@@ -13,6 +13,11 @@ export class GridManager {
         return Result.Fail("Not Implemented Error")
     }
 
+    setGrid(grid: Grid): Result<boolean> {
+        this.grid = grid;
+        return Result.Success(true);
+    }
+
     getGrid(): Result<Grid> {
         if (!this.grid) return Result.Fail("Grid has not been initialized");
         return Result.Success(this.grid);

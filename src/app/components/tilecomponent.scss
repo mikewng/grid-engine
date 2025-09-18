@@ -2,5 +2,81 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    border: 1px solid black;
+    border: 1px solid #333;
+    background-color: #4a7c59;
+    position: relative;
+
+    &.ge-tile-grass {
+        background-color: #4a7c59;
+    }
+
+    &.ge-tile-water {
+        background-color: #4a7cb8;
+    }
+
+    &.ge-tile-mountain {
+        background-color: #8b7355;
+    }
+
+    &.ge-tile-selected {
+        background-color: #ff00bb;
+    }
+
+    &.ge-tile-highlighted {
+        background-color: rgba(255, 255, 0, 0.3);
+    }
+
+    &.ge-tile-clickable {
+        cursor: pointer;
+
+        &:hover {
+            filter: brightness(1.1);
+        }
+    }
+
+    .ge-tile-content {
+        width: 100%;
+        height: 100%;
+        position: relative;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .ge-tile-unit-indicator {
+        width: 70%;
+        height: 70%;
+        background-color: #ff6b6b;
+        border: 2px solid #fff;
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        position: relative;
+        z-index: 2;
+
+        &::after {
+            content: "U";
+            color: white;
+            font-weight: bold;
+            font-size: 14px;
+        }
+    }
+
+    .ge-tile-debug-info {
+        position: absolute;
+        top: 2px;
+        left: 2px;
+        font-size: 8px;
+        color: #fff;
+        background: rgba(0, 0, 0, 0.6);
+        padding: 1px 2px;
+        border-radius: 2px;
+        z-index: 3;
+
+        .ge-tile-coords {
+            display: block;
+        }
+    }
 }
