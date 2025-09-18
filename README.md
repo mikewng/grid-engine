@@ -76,7 +76,7 @@ TBD
 ### Manager
 - TBD
 
-## Running Instructions
+# Running Instructions
 To Run:
 1. Clone Repository
 2. npm install
