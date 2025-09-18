@@ -1,17 +1,12 @@
 import { IUnit } from "@/app/engine/models/units/iunit"
 import "./combatui.scss"
 
-interface CombatStatsUI {
+interface CombatStatsUIProps {
     unit: IUnit;
     combatType: string;
 }
 
-interface CombatUIProps {
-    initiator: IUnit;
-    defender: IUnit;
-}
-
-const CombatSubUIComponent: React.FC<CombatStatsUI> = ({ unit, combatType }) => {
+const CombatSubUIComponent: React.FC<CombatStatsUIProps> = ({ unit, combatType }) => {
     return (
         <div className={"combatui-sub-cpnt-wrapper " + (combatType ?? "")}>
             <div className="unit-icon"></div>
@@ -36,6 +31,11 @@ const CombatSubUIComponent: React.FC<CombatStatsUI> = ({ unit, combatType }) => 
             </div>
         </div>
     )
+}
+
+interface CombatUIProps {
+    initiator: IUnit;
+    defender: IUnit;
 }
 
 const CombatUI: React.FC<CombatUIProps> =

@@ -9,6 +9,7 @@ export const testKnightUnit = new GameUnit(
     { id: "knight-class", name: "Knight" },
     {
         level: 5,
+        currentExperience: 10,
         currentHealth: 25,
         maxHealth: 25,
         strength: 12,
@@ -44,6 +45,7 @@ export const testMageUnit = new GameUnit(
     { id: "mage-class", name: "Mage" },
     {
         level: 5,
+        currentExperience: 10,
         currentHealth: 16,
         maxHealth: 25,
         strength: 12,
@@ -79,6 +81,7 @@ export const testEnemy = new GameUnit(
     { id: "mage-class", name: "Mage" },
     {
         level: 5,
+        currentExperience: 10,
         currentHealth: 16,
         maxHealth: 25,
         strength: 12,

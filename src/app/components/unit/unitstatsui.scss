@@ -1,0 +1,24 @@
+.unitstatsui-cpnt-wrapper {
+    .unitstatsui-header-container {
+        display: flex;
+        justify-content: space-between;
+        gap: 1rem;
+    }
+
+    .unitstatsui-body-container {
+        display: flex;
+        justify-content: space-between;
+        gap: 1rem;
+    }
+}
+
+.unitbasicstatsui-cpnt-wrapper {
+    display: flex;
+    gap: 1rem;
+
+    .basic-stat-container {
+        display: flex;
+        justify-content: space-between;
+        gap: 0.5rem;
+    }
+}

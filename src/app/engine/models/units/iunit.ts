@@ -22,6 +22,7 @@ export interface IUnit {
 }
 
 export interface UnitStats {
+    currentExperience: number;
     level: number;
     currentHealth: number;
     maxHealth: number;

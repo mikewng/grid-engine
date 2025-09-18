@@ -12,10 +12,11 @@ import { Tile } from "../../engine/models/grid/tile";
 import { Coordinate } from "../../engine/models/grid/coordinate";
 // UI Components
 import GridComponent from "@/app/components/grid/gridcomponent";
-import GeneralDebugger from "../components/uidebug/generaldebugger";
+import GeneralDebugger from "@/app/screens/sandbox/components/uidebug/generaldebugger";
 // CSS
 import "./sandbox.scss"
 import CombatUI from "@/app/components/combat/combatui";
+import UnitStatsUI from "@/app/components/unit/unitstatsui";
 
 const SandboxScreen = () => {
     const testUnits = useMemo(() => {
@@ -93,6 +94,9 @@ const SandboxScreen = () => {
                 initiator={testKnightUnit}
                 defender={testEnemy}
             /> */}
+            <UnitStatsUI
+                unit={testKnightUnit}
+            />
             <div className="ge-sandbox-content-container">
                 {(() => {
                     const gridResult = gridManager.getGrid();
