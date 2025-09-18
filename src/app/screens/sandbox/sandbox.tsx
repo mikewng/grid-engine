@@ -3,16 +3,16 @@
 // React and External Imports
 import { useMemo, useState } from "react";
 // Initializations
-import { GameSetup } from "../data/game/gamesetup";
-import { testKnightUnit, testMageUnit } from "../data/units/testunit";
-import { testGridArr } from "../data/grid/testgrid";
+import { GameSetup } from "../../data/game/gamesetup";
+import { testKnightUnit, testMageUnit } from "../../data/units/testunit";
+import { testGridArr } from "../../data/grid/testgrid";
 // Grid
-import { Tile } from "../engine/models/grid/tile";
+import { Tile } from "../../engine/models/grid/tile";
 // Movement
-import { Coordinate } from "../engine/models/grid/coordinate";
+import { Coordinate } from "../../engine/models/grid/coordinate";
 // UI Components
-import GridComponent from "../components/gridcomponent";
-import GeneralDebugger from "./uidebug/generaldebugger";
+import GridComponent from "../../components/gridcomponent";
+import GeneralDebugger from "../components/uidebug/generaldebugger";
 // CSS
 import "./sandbox.scss"
 

@@ -1,4 +1,4 @@
-import SandboxScreen from "./screens/sandbox";
+import SandboxScreen from "./screens/sandbox/sandbox";
 
 export default function Home() {
   return (
