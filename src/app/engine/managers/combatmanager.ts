@@ -1,6 +1,6 @@
 import { UnitManager } from "./unitmanager";
 import { Result } from "../utils/resultclass";
-import { Unit } from "../models/units/unit";
+import { IUnit } from "../models/units/iunit";
 
 interface CombatResult {
     attackerDamageDealt: number;
@@ -113,7 +113,7 @@ export class CombatManager {
         return Result.Success(combatResult);
     }
 
-    calculateHitRate(attacker: Unit, defender: Unit): number {
+    calculateHitRate(attacker: IUnit, defender: IUnit): number {
         // Calculate hit rate for unit
         // Formula: (base hit rate + skill stat*2 and luck/2) - (speed + luck)
         if (attacker.equippedWeapon?.baseHitRate) {
@@ -126,14 +126,14 @@ export class CombatManager {
 
     }
 
-    calculateDoubleHit(attacker: Unit, defender: Unit): boolean {
+    calculateDoubleHit(attacker: IUnit, defender: IUnit): boolean {
         // Calculate if unit gets double hit based on speed difference
         // Formula: attacker speed - defender speed >= threshold (usually 4)
         const speedDifference = attacker.stats.speed - defender.stats.speed;
         return speedDifference >= 4;
     }
 
-    calculateCritRate(unit: Unit): number {
+    calculateCritRate(unit: IUnit): number {
         // Calculate critical hit rate based on skill stat
         // Formula: skill / 2 + weapon crit 
         if (unit.equippedWeapon?.baseCritRate) {
@@ -153,7 +153,7 @@ export class CombatManager {
         return Math.random() * 100 < critrate;
     }
 
-    canCounterAttack(defender: Unit, attacker: Unit): boolean {
+    canCounterAttack(defender: IUnit, attacker: IUnit): boolean {
         // Check if defender can counter attack based on range, weapon type, etc.
         // For now, simple implementation - defender can counter if they have a weapon
         if (defender.equippedWeapon && attacker.equippedWeapon) {
@@ -163,7 +163,7 @@ export class CombatManager {
         }
     }
 
-    calculateDamage(attacker: Unit, defender: Unit): number {
+    calculateDamage(attacker: IUnit, defender: IUnit): number {
         // Calculate damage: attack stat - defense stat
         const attackStat = attacker.stats.strength; // Could be magic for magic units
         const defenseStat = defender.stats.defense; // Could be resistance for magic damage

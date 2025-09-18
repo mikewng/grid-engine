@@ -2,7 +2,7 @@ import { Coordinate } from "../models/grid/coordinate";
 import { Grid } from "../models/grid/grid";
 import { TileType } from "../models/grid/itile";
 import { Tile } from "../models/grid/tile";
-import { Unit } from "../models/units/unit";
+import { Unit } from "../models/units/iunit";
 import { Result } from "../utils/resultclass";
 
 export class GridManager {

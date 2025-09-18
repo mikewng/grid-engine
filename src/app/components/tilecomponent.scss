@@ -26,6 +26,11 @@
         background-color: rgba(255, 255, 0, 0.3);
     }
 
+    &.ge-tile-movement-range {
+        background-color: rgba(0, 150, 255, 0.4);
+        box-shadow: inset 0 0 10px rgba(0, 150, 255, 0.3);
+    }
+
     &.ge-tile-clickable {
         cursor: pointer;
 

@@ -1,6 +1,6 @@
 import { Coordinate } from "../../models/grid/coordinate";
 import { ITile } from "../../models/grid/itile";
-import { Unit } from "../../models/units/unit";
+import { Unit } from "../../models/units/iunit";
 import { Result } from "../../utils/resultclass";
 
 export interface MovementCostCalculator {

@@ -1,12 +1,12 @@
-import { Unit, UnitFaction, UnitStats } from "../models/units/unit";
+import { IUnit, UnitFaction, UnitStats } from "../models/units/iunit";
 import { Result } from "../utils/resultclass";
 
 export class UnitManager {
-    private units: Map<string, Unit> = new Map();
+    private units: Map<string, IUnit> = new Map();
 
 
     // BASIC CRUD
-    setUnit(unit: Unit): Result<boolean> {
+    setUnit(unit: IUnit): Result<boolean> {
         this.units.set(unit.id, unit);
         return Result.Success(true)
     }
@@ -16,19 +16,19 @@ export class UnitManager {
         return Result.Success(true)
     }
 
-    getUnitById(id: string): Result<Unit> {
+    getUnitById(id: string): Result<IUnit> {
         const unit = this.units.get(id)
         if (!unit) return Result.Fail("Could not find unit by given ID.")
         return Result.Success(unit);
     }
 
-    getUnitAtPosition(x: number, y: number): Result<Unit> {
+    getUnitAtPosition(x: number, y: number): Result<IUnit> {
         const unit = Array.from(this.units.values()).find(unit => unit.position.x === x && unit.position.y === y);
         if (!unit) return Result.Fail(`No unit found at position (${x}, ${y})`);
         return Result.Success(unit);
     }
 
-    getUnitsByFaction(factionType: UnitFaction): Result<Unit[]> {
+    getUnitsByFaction(factionType: UnitFaction): Result<IUnit[]> {
         const units = Array.from(this.units.values()).filter(unit => unit.unitFaction === factionType);
         return Result.Success(units);
     }
@@ -39,16 +39,16 @@ export class UnitManager {
         return Result.Success(unit.stats);
     }
 
-    getAllUnits(): Result<Unit[]> {
+    getAllUnits(): Result<IUnit[]> {
         return Result.Success(Array.from(this.units.values()));
     }
 
-    getAliveUnits(): Result<Unit[]> {
+    getAliveUnits(): Result<IUnit[]> {
         const aliveUnits = Array.from(this.units.values()).filter(unit => unit.isAlive);
         return Result.Success(aliveUnits);
     }
 
-    getActiveUnits(): Result<Unit[]> {
+    getActiveUnits(): Result<IUnit[]> {
         const activeUnits = Array.from(this.units.values()).filter(unit => unit.isAlive && !unit.hasActed);
         return Result.Success(activeUnits);
     }
@@ -63,7 +63,7 @@ export class UnitManager {
         }
     }
 
-    patchUnit(id: string, changes: Partial<Unit>): Result<Unit> {
+    patchUnit(id: string, changes: Partial<IUnit>): Result<IUnit> {
         const unit = this.getUnitById(id);
         if (!unit.value) return Result.Fail("Could not find unit by given ID.");
         this.setUnit({ ...unit.value, ...changes })
@@ -72,7 +72,7 @@ export class UnitManager {
     }
 
     // BUSINESS LOGIC
-    markUnitActed(id: string): Result<Unit> {
+    markUnitActed(id: string): Result<IUnit> {
         const unit = this.getUnitById(id);
         if (!unit.value) return Result.Fail("Could not find unit by given ID.");
         this.setUnit({ ...unit.value, hasActed: true })

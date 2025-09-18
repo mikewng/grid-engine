@@ -5,8 +5,8 @@ import GridComponent from "../components/gridcomponent";
 import { TileType } from "../engine/models/grid/itile";
 import { Tile } from "../engine/models/grid/tile";
 import { Grid } from "../engine/models/grid/grid";
-import { GameUnit } from "../engine/models/units/unit-impl";
-import { UnitFaction } from "../engine/models/units/unit";
+import { GameUnit } from "../engine/models/units/unit";
+import { UnitFaction } from "../engine/models/units/iunit";
 import { GridManager } from "../engine/managers/gridmanager";
 import { UnitManager } from "../engine/managers/unitmanager";
 import { MovementManager } from "../engine/managers/movementmanager";
@@ -114,6 +114,7 @@ const SandboxScreen = () => {
     const [selectedTile, setSelectedTile] = useState<Tile | null>(null);
     const [selectedUnit, setSelectedUnit] = useState<string | null>(null);
     const [movementPath, setMovementPath] = useState<Coordinate[]>([]);
+    const [movementRange, setMovementRange] = useState<Set<string>>(new Set());
 
     // Handle tile click
     const handleTileClick = (tile: Tile) => {
@@ -124,6 +125,19 @@ const SandboxScreen = () => {
         if (tile.occupiedByUnitId) {
             setSelectedUnit(tile.occupiedByUnitId);
             setMovementPath([]);
+
+            // Calculate and display movement range
+            const rangeResult = movementManager.getMovementRange(tile.occupiedByUnitId);
+            if (rangeResult.success && rangeResult.value) {
+                const rangeSet = new Set<string>();
+                rangeResult.value.forEach(coord => {
+                    rangeSet.add(`${coord.x}-${coord.y}`);
+                });
+                setMovementRange(rangeSet);
+            } else {
+                setMovementRange(new Set());
+            }
+
             console.log(`Selected unit: ${tile.occupiedByUnitId}`);
             return;
         }
@@ -137,8 +151,8 @@ const SandboxScreen = () => {
             if (moveResult.success) {
                 console.log(`Movement successful!`);
                 setMovementPath(path);
-                // Update grid to reflect the movement
-                const updatedGrid = new Grid(testGrid.height, testGrid.width, testGrid.gridcontent);
+                setMovementRange(new Set()); // Clear movement range after moving
+                setSelectedUnit(null); // Deselect unit after move
                 setSelectedTile(tile);
             } else {
                 console.log(`Movement failed: ${moveResult.err}`);
@@ -151,6 +165,7 @@ const SandboxScreen = () => {
     const handleUnitDeselect = () => {
         setSelectedUnit(null);
         setMovementPath([]);
+        setMovementRange(new Set());
     };
 
     return (
@@ -199,6 +214,7 @@ const SandboxScreen = () => {
                     grid={testGrid}
                     onTileClick={handleTileClick}
                     selectedTile={selectedTile}
+                    movementRangeTiles={movementRange}
                 />
             </div>
         </div>

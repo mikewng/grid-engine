@@ -10,13 +10,15 @@ interface GridProps {
     onTileClick?: (tile: Tile) => void;
     selectedTile?: Tile | null;
     highlightedTiles?: Set<string>;
+    movementRangeTiles?: Set<string>;
 }
 
-const GridComponent: React.FC<GridProps> = memo(({ 
-    grid, 
-    onTileClick, 
-    selectedTile, 
-    highlightedTiles = new Set() 
+const GridComponent: React.FC<GridProps> = memo(({
+    grid,
+    onTileClick,
+    selectedTile,
+    highlightedTiles = new Set(),
+    movementRangeTiles = new Set()
 }) => {
     // Flatten grid for efficient rendering
     const flattenedTiles = useMemo(() => {
@@ -56,6 +58,7 @@ const GridComponent: React.FC<GridProps> = memo(({
                     const tileKey = `${tile.x}-${tile.y}`;
                     const isSelected = selectedTile?.x === tile.x && selectedTile?.y === tile.y;
                     const isHighlighted = highlightedTiles.has(tileKey);
+                    const isInMovementRange = movementRangeTiles.has(tileKey);
 
                     return (
                         <TileComponent
@@ -64,6 +67,7 @@ const GridComponent: React.FC<GridProps> = memo(({
                             onClick={handleTileClick}
                             isSelected={isSelected}
                             isHighlighted={isHighlighted}
+                            isInMovementRange={isInMovementRange}
                         />
                     );
                 })}

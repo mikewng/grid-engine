@@ -8,7 +8,7 @@ import {
     MovementTracker,
     GridMutator
 } from "./interfaces/movement-interfaces";
-import { Unit } from "../models/units/unit";
+import { IUnit } from "../models/units/iunit";
 
 export class MovementManager {
     constructor(
@@ -40,7 +40,7 @@ export class MovementManager {
         return Result.Success(true);
     }
 
-    private executeMovement(unit: Unit, path: Coordinate[]): Result<boolean> {
+    private executeMovement(unit: IUnit, path: Coordinate[]): Result<boolean> {
         let budget = this.movementTracker.initializeBudget(unit);
         const visited: Coordinate[] = [unit.position];
 
@@ -71,9 +71,88 @@ export class MovementManager {
         return Result.Success(true);
     }
 
-    private rollbackMovement(unit: Unit, visited: Coordinate[]): void {
+    private rollbackMovement(unit: IUnit, visited: Coordinate[]): void {
         if (visited.length > 0) {
             this.gridMutator.moveUnit(unit, visited[0]);
         }
+    }
+
+    getMovementRange(unitId: string): Result<Coordinate[]> {
+        const unit = this.units.getUnitById(unitId);
+        if (!unit.success || !unit.value) {
+            return Result.Fail("Could not find unit for getMovementRange()");
+        }
+
+        const movementBudget = this.movementTracker.initializeBudget(unit.value);
+        const reachableTiles: Coordinate[] = [];
+        const visited = new Set<string>();
+        const queue: Array<{ position: Coordinate, remainingBudget: number }> = [];
+
+        queue.push({ position: unit.value.position, remainingBudget: movementBudget });
+        visited.add(`${unit.value.position.x},${unit.value.position.y}`);
+
+        while (queue.length > 0) {
+            const current = queue.shift()!;
+
+            const neighbors = this.getAdjacentTiles(current.position);
+            for (const neighbor of neighbors) {
+                const positionKey = `${neighbor.x},${neighbor.y}`;
+
+                if (visited.has(positionKey)) {
+                    continue;
+                }
+
+                const stepValidation = this.pathValidator.validateStep(neighbor, unit.value);
+                if (!stepValidation.success) {
+                    continue;
+                }
+
+                const tile = this.grid.getTileAtPosition(neighbor.x, neighbor.y);
+                if (!tile.success || !tile.value) {
+                    continue;
+                }
+
+                const movementCost = this.costCalculator.calculateCost(tile.value, unit.value);
+                const budgetResult = this.movementTracker.consumeBudget(current.remainingBudget, movementCost);
+
+                if (budgetResult.success && budgetResult.value !== undefined && budgetResult.value >= 0) {
+                    visited.add(positionKey);
+                    reachableTiles.push(neighbor);
+
+                    if (budgetResult.value > 0) {
+                        queue.push({
+                            position: neighbor,
+                            remainingBudget: budgetResult.value
+                        });
+                    }
+                }
+            }
+        }
+
+        return Result.Success(reachableTiles);
+    }
+
+    private getAdjacentTiles(position: Coordinate): Coordinate[] {
+        const adjacent: Coordinate[] = [];
+        const directions = [
+            { x: 0, y: -1 }, // North
+            { x: 1, y: 0 },  // East
+            { x: 0, y: 1 },  // South
+            { x: -1, y: 0 }  // West
+        ];
+
+        for (const direction of directions) {
+            const newPosition = {
+                x: position.x + direction.x,
+                y: position.y + direction.y
+            };
+
+            const isValid = this.grid.isValidPosition(newPosition.x, newPosition.y);
+            if (isValid.success && isValid.value) {
+                adjacent.push(newPosition);
+            }
+        }
+
+        return adjacent;
     }
 }

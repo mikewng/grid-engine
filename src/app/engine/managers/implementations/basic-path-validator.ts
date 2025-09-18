@@ -2,12 +2,12 @@ import { Coordinate } from "../../models/grid/coordinate";
 import { GridManager } from "../gridmanager";
 import { PathValidator } from "../interfaces/movement-interfaces";
 import { Result } from "../../utils/resultclass";
-import { Unit } from "../../models/units/unit";
+import { IUnit } from "../../models/units/iunit";
 
 export class BasicPathValidator implements PathValidator {
     constructor(private gridManager: GridManager) {}
 
-    validatePath(path: Coordinate[], unit: Unit): Result<void> {
+    validatePath(path: Coordinate[], unit: IUnit): Result<void> {
         if (path.length === 0) {
             return Result.Fail("Path cannot be empty");
         }
@@ -22,7 +22,7 @@ export class BasicPathValidator implements PathValidator {
         return Result.Success(undefined);
     }
 
-    validateStep(coordinate: Coordinate, unit: Unit): Result<void> {
+    validateStep(coordinate: Coordinate, unit: IUnit): Result<void> {
         const isValidPosition = this.gridManager.isValidPosition(coordinate.x, coordinate.y);
         if (!isValidPosition.success || !isValidPosition.value) {
             return Result.Fail(`Invalid position: (${coordinate.x}, ${coordinate.y})`);

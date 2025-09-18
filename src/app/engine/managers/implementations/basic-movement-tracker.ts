@@ -1,9 +1,9 @@
 import { MovementTracker } from "../interfaces/movement-interfaces";
 import { Result } from "../../utils/resultclass";
-import { Unit } from "../../models/units/unit";
+import { IUnit } from "../../models/units/iunit";
 
 export class BasicMovementTracker implements MovementTracker {
-    initializeBudget(unit: Unit): number {
+    initializeBudget(unit: IUnit): number {
         return unit.stats.movement;
     }
 
