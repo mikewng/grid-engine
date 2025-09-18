@@ -20,6 +20,7 @@ const GridComponent: React.FC<GridProps> = memo(({
     highlightedTiles = new Set(),
     movementRangeTiles = new Set()
 }) => {
+    
     // Flatten grid for efficient rendering
     const flattenedTiles = useMemo(() => {
         const tiles: Tile[] = [];
@@ -31,7 +32,6 @@ const GridComponent: React.FC<GridProps> = memo(({
         return tiles;
     }, [grid.gridcontent, grid.height, grid.width]);
 
-    // Memoized tile click handler
     const handleTileClick = useCallback((tile: Tile) => {
         onTileClick?.(tile);
     }, [onTileClick]);
@@ -41,7 +41,7 @@ const GridComponent: React.FC<GridProps> = memo(({
         display: 'grid',
         gridTemplateColumns: `repeat(${grid.width}, 1fr)`,
         gridTemplateRows: `repeat(${grid.height}, 1fr)`,
-        gap: '1px',
+        gap: '0px',
         aspectRatio: `${grid.width} / ${grid.height}`,
         width: '100%',
         margin: '0 auto'

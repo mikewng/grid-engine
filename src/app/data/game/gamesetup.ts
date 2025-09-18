@@ -17,7 +17,7 @@ export interface GameManagers {
 }
 
 export class GameSetup {
-    static initializeManagers(gridArray: string[][], unit: GameUnit): GameManagers {
+    static initializeManagers(gridArray: string[][], units: GameUnit[]): GameManagers {
         const gridManager = new GridManager();
         const unitManager = new UnitManager();
 
@@ -28,13 +28,15 @@ export class GameSetup {
             throw new Error(`Failed to build grid: ${gridResult.err}`);
         }
 
-        unitManager.setUnit(unit);
 
-        // Place unit on the grid
-        const tileOccupationResult = gridManager.setTileOccupation(unit.position.x, unit.position.y, unit.id);
-        if (!tileOccupationResult.success) {
-            throw new Error(`Failed to place unit on grid: ${tileOccupationResult.err}`);
-        }
+        units.forEach(unit => {
+            unitManager.setUnit(unit);
+            // Place unit on the grid
+            const tileOccupationResult = gridManager.setTileOccupation(unit.position.x, unit.position.y, unit.id);
+            if (!tileOccupationResult.success) {
+                throw new Error(`Failed to place unit on grid: ${tileOccupationResult.err}`);
+            }
+        });
 
         // Create movement system components
         const costCalculator = new BasicMovementCostCalculator();

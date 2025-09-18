@@ -10,7 +10,7 @@ export const TileDictionary: { [key: string]: TileType } = {
 
 export const movementCostMap: { [key in TileType]: number } = {
     [TileType.Grass]: 1,
-    [TileType.Forest]: 7,
+    [TileType.Forest]: 5,
     [TileType.Mountain]: 3,
     [TileType.Water]: 2,
     [TileType.Block]: Number.MAX_SAFE_INTEGER

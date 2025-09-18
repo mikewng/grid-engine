@@ -4,7 +4,7 @@
 import { useMemo, useState } from "react";
 // Initializations
 import { GameSetup } from "../data/game/gamesetup";
-import { testKnightUnit } from "../data/units/testunit";
+import { testKnightUnit, testMageUnit } from "../data/units/testunit";
 import { testGridArr } from "../data/grid/testgrid";
 // Grid
 import { Tile } from "../engine/models/grid/tile";
@@ -17,13 +17,13 @@ import GeneralDebugger from "./uidebug/generaldebugger";
 import "./sandbox.scss"
 
 const SandboxScreen = () => {
-    const testUnit = useMemo(() => {
-        return testKnightUnit;
+    const testUnits = useMemo(() => {
+        return [testKnightUnit, testMageUnit];
     }, []);
 
     const { gridManager, unitManager, movementManager } = useMemo(() => {
-        return GameSetup.initializeManagers(testGridArr, testUnit);
-    }, [testGridArr, testUnit]);
+        return GameSetup.initializeManagers(testGridArr, testUnits);
+    }, [testGridArr, testUnits]);
 
     const [selectedTile, setSelectedTile] = useState<Tile | null>(null);
     const [selectedUnit, setSelectedUnit] = useState<string | null>(null);
