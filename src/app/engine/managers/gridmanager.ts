@@ -1,14 +1,49 @@
 import { Grid } from "../models/grid/grid";
 import { TileType } from "../models/grid/itile";
 import { Tile } from "../models/grid/tile";
+import { TileDictionary } from "@/app/data/grid/tileDictionary";
+import { movementCostMap } from "@/app/data/grid/tileDictionary";
 import { Result } from "../utils/resultclass";
 
 export class GridManager {
     private grid: Grid | null = null;
 
     // Generic Functions
-    buildGridfromArr(): Result<boolean> {
-        return Result.Fail("Not Implemented Error")
+    buildGridFromArr(arr: string[][]): Result<boolean> {
+        if (!arr || arr.length === 0) {
+            return Result.Fail("Array cannot be empty");
+        }
+
+        const height = arr.length;
+        const width = arr[0].length;
+
+        for (let row of arr) {
+            if (row.length !== width) {
+                return Result.Fail("All rows must have the same length");
+            }
+        }
+
+        const gridContent: Tile[][] = [];
+
+        for (let y = 0; y < height; y++) {
+            const row: Tile[] = [];
+            for (let x = 0; x < width; x++) {
+                const tileChar = arr[y][x];
+                const tileType = TileDictionary[tileChar];
+
+                if (tileType === undefined) {
+                    return Result.Fail(`Unknown tile character: '${tileChar}' at position (${x}, ${y})`);
+                }
+
+                const movementCost = movementCostMap[tileType];
+                const tile = new Tile(tileType, x, y, movementCost);
+                row.push(tile);
+            }
+            gridContent.push(row);
+        }
+
+        this.grid = new Grid(height, width, gridContent);
+        return Result.Success(true);
     }
 
     setGrid(grid: Grid): Result<boolean> {

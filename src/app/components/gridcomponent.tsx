@@ -44,7 +44,6 @@ const GridComponent: React.FC<GridProps> = memo(({
         gap: '1px',
         aspectRatio: `${grid.width} / ${grid.height}`,
         width: '100%',
-        maxWidth: '800px',
         margin: '0 auto'
     }), [grid.width, grid.height]);
 

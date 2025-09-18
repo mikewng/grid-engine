@@ -1,1 +1,10 @@
-export const testGrid = [];
+export const testGridArr = [
+    ['G', 'G', 'F', 'M', 'F', 'G', 'G', 'G'],
+    ['G', 'W', 'W', 'G', 'G', 'G', 'G', 'G'],
+    ['F', 'G', 'G', 'G', 'F', 'G', 'G', 'G'],
+    ['F', 'G', 'G', 'G', 'F', 'G', 'G', 'G'],
+    ['F', 'G', 'W', 'G', 'G', 'G', 'B', 'G'],
+    ['F', 'G', 'G', 'G', 'B', 'G', 'B', 'G'],
+    ['F', 'G', 'G', 'G', 'B', 'B', 'B', 'G'],
+
+];
