@@ -1,0 +1,18 @@
+.general-debugger-wrapper {
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+
+    bottom: 0;
+    right: 0;
+    padding: 0.5rem;
+
+    border: 1px solid black;
+
+    min-width: 30rem;
+
+    .ge-header {
+        font-size: 1.2rem;
+        font-weight: 600;
+    }
+}

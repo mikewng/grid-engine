@@ -1,8 +1,6 @@
-import { Coordinate } from "../models/grid/coordinate";
 import { Grid } from "../models/grid/grid";
 import { TileType } from "../models/grid/itile";
 import { Tile } from "../models/grid/tile";
-import { Unit } from "../models/units/iunit";
 import { Result } from "../utils/resultclass";
 
 export class GridManager {
@@ -144,10 +142,20 @@ export class GridManager {
         }
     }
 
-    // TO BE IMPLEMENTED
-    moveUnitOnGrid(unit: Unit, x: number, y: number): Result<Coordinate> {
+    setTileOccupation(x: number, y: number, unitId: string | undefined): Result<void> {
         if (!this.grid) return Result.Fail("Grid has not been initialized");
-        return Result.Fail("not implemented");
+
+        const tile = this.getTileAtPosition(x, y);
+        if (!tile.success || !tile.value) {
+            return Result.Fail(`Could not find tile at position (${x}, ${y})`);
+        }
+
+        tile.value.occupiedByUnitId = unitId;
+        return Result.Success(undefined);
+    }
+
+    clearTileOccupation(x: number, y: number): Result<void> {
+        return this.setTileOccupation(x, y, undefined);
     }
 
 }

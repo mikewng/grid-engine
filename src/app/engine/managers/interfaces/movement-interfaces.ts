@@ -21,3 +21,8 @@ export interface GridMutator {
     moveUnit(unit: IUnit, newPosition: Coordinate): Result<void>;
     canOccupy(position: Coordinate): boolean;
 }
+
+export interface PathfindingService {
+    calculateMovementRange(unit: IUnit, movementBudget: number): Result<Coordinate[]>;
+    findPath(unit: IUnit, from: Coordinate, to: Coordinate): Result<Coordinate[]>;
+}
