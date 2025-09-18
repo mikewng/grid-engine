@@ -1,6 +1,6 @@
 import { Coordinate } from "../models/grid/coordinate";
 import { ITile } from "../models/grid/itile";
-import { Unit } from "../models/units/iunit";
+import { IUnit } from "../models/units/iunit";
 import { Result } from "./resultclass";
 import {
     MovementCostCalculator,
@@ -12,7 +12,7 @@ import { GridManager } from "../managers/gridmanager";
 import { UnitManager } from "../managers/unitmanager";
 
 export class BasicMovementCostCalculator implements MovementCostCalculator {
-    calculateCost(tile: ITile, unit: Unit): number {
+    calculateCost(tile: ITile, unit: IUnit): number {
         return tile.movementCost;
     }
 }
@@ -20,7 +20,7 @@ export class BasicMovementCostCalculator implements MovementCostCalculator {
 export class BasicPathValidator implements PathValidator {
     constructor(private gridManager: GridManager) {}
 
-    validatePath(path: Coordinate[], unit: Unit): Result<void> {
+    validatePath(path: Coordinate[], unit: IUnit): Result<void> {
         if (path.length === 0) {
             return Result.Fail("Path cannot be empty");
         }
@@ -44,7 +44,7 @@ export class BasicPathValidator implements PathValidator {
         return Result.Success(undefined);
     }
 
-    validateStep(coordinate: Coordinate, unit: Unit): Result<void> {
+    validateStep(coordinate: Coordinate, unit: IUnit): Result<void> {
         const positionValid = this.gridManager.isValidPosition(coordinate.x, coordinate.y);
         if (!positionValid.success || !positionValid.value) {
             return Result.Fail(`Invalid position: (${coordinate.x}, ${coordinate.y})`);
@@ -64,7 +64,7 @@ export class BasicPathValidator implements PathValidator {
 }
 
 export class BasicMovementTracker implements MovementTracker {
-    initializeBudget(unit: Unit): number {
+    initializeBudget(unit: IUnit): number {
         return unit.stats.movement;
     }
 
@@ -83,7 +83,7 @@ export class BasicGridMutator implements GridMutator {
         private unitManager: UnitManager
     ) {}
 
-    moveUnit(unit: Unit, newPosition: Coordinate): Result<void> {
+    moveUnit(unit: IUnit, newPosition: Coordinate): Result<void> {
         // Clear old position
         const oldTile = this.gridManager.getTileAtPosition(unit.position.x, unit.position.y);
         if (oldTile.success && oldTile.value) {
