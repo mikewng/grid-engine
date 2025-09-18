@@ -1,6 +1,6 @@
 import React, { memo, useMemo } from "react";
-import { Tile } from "../engine/models/grid/tile";
-import { TileType } from "../engine/models/grid/itile";
+import { Tile } from "../../engine/models/grid/tile";
+import { TileType } from "../../engine/models/grid/itile";
 
 import "./tilecomponent.scss"
 

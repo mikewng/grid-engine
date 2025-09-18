@@ -69,3 +69,38 @@ export const testMageUnit = new GameUnit(
     },
     UnitFaction.P1
 );
+
+
+export const testEnemy = new GameUnit(
+    "test-enemy-1",
+    "mage",
+    "Test Enemy",
+    { x: 10, y: 2 },
+    { id: "mage-class", name: "Mage" },
+    {
+        level: 5,
+        currentHealth: 16,
+        maxHealth: 25,
+        strength: 12,
+        magic: 2,
+        skill: 8,
+        speed: 6,
+        luck: 4,
+        defense: 10,
+        resistance: 3,
+        movement: 5
+    },
+    {
+        levelGR: 100,
+        healthGR: 85,
+        strengthGR: 75,
+        magicGR: 10,
+        skillGR: 60,
+        speedGR: 50,
+        luckGR: 30,
+        defenseGR: 70,
+        resistanceGR: 25,
+        movementGR: 15
+    },
+    UnitFaction.ENEMY
+);

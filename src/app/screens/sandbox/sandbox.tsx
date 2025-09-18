@@ -4,21 +4,22 @@
 import { useMemo, useState } from "react";
 // Initializations
 import { GameSetup } from "../../data/game/gamesetup";
-import { testKnightUnit, testMageUnit } from "../../data/units/testunit";
+import { testEnemy, testKnightUnit, testMageUnit } from "../../data/units/testunit";
 import { testGridArr } from "../../data/grid/testgrid";
 // Grid
 import { Tile } from "../../engine/models/grid/tile";
 // Movement
 import { Coordinate } from "../../engine/models/grid/coordinate";
 // UI Components
-import GridComponent from "../../components/gridcomponent";
+import GridComponent from "@/app/components/grid/gridcomponent";
 import GeneralDebugger from "../components/uidebug/generaldebugger";
 // CSS
 import "./sandbox.scss"
+import CombatUI from "@/app/components/combat/combatui";
 
 const SandboxScreen = () => {
     const testUnits = useMemo(() => {
-        return [testKnightUnit, testMageUnit];
+        return [testKnightUnit, testMageUnit, testEnemy];
     }, []);
 
     const { gridManager, unitManager, movementManager } = useMemo(() => {
@@ -88,6 +89,10 @@ const SandboxScreen = () => {
                     selectedUnit={unitManager.getUnitById(selectedUnit ?? "").value}
                 />
             </div>
+            {/* <CombatUI
+                initiator={testKnightUnit}
+                defender={testEnemy}
+            /> */}
             <div className="ge-sandbox-content-container">
                 {(() => {
                     const gridResult = gridManager.getGrid();

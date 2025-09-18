@@ -1,0 +1,44 @@
+.combatui-cpnt-wrapper {
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+
+    top: 25%;
+
+    z-index: 2000;
+
+    padding: 1rem;
+    background-color: white;
+    border: 1px solid black;
+
+    .combatui-visual-container {
+        padding: 7rem 10rem 7rem 10rem;
+        border: 1px solid black;
+    }
+
+    .combatui-stats-container {
+        display: flex;
+        justify-content: space-between;
+        gap: 1rem;
+        border: 1px solid black;
+        width: 100%;
+    }
+
+}
+
+.combatui-sub-cpnt-wrapper {
+    display: flex;
+    flex-direction: column;
+    padding: 0.5rem;
+
+    .unit-stats-general-container {
+        .stats-container {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+        }
+    }
+}

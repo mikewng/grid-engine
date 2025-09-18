@@ -1,7 +1,7 @@
 import React, { memo, useMemo, useCallback } from "react";
-import { Grid } from "../engine/models/grid/grid";
-import { Tile } from "../engine/models/grid/tile";
-import TileComponent from "./tilecomponent";
+import { Grid } from "@/app/engine/models/grid/grid";
+import { Tile } from "@/app/engine/models/grid/tile";
+import TileComponent from "@/app/components/tile/tilecomponent";
 
 import "./gridcomponent.scss"
 
