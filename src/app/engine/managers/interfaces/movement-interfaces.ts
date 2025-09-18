@@ -1,23 +1,23 @@
 import { Coordinate } from "../../models/grid/coordinate";
 import { ITile } from "../../models/grid/itile";
-import { Unit } from "../../models/units/iunit";
+import { IUnit } from "../../models/units/iunit";
 import { Result } from "../../utils/resultclass";
 
 export interface MovementCostCalculator {
-    calculateCost(tile: ITile, unit: Unit): number;
+    calculateCost(tile: ITile, unit: IUnit): number;
 }
 
 export interface PathValidator {
-    validatePath(path: Coordinate[], unit: Unit): Result<void>;
-    validateStep(coordinate: Coordinate, unit: Unit): Result<void>;
+    validatePath(path: Coordinate[], unit: IUnit): Result<void>;
+    validateStep(coordinate: Coordinate, unit: IUnit): Result<void>;
 }
 
 export interface MovementTracker {
-    initializeBudget(unit: Unit): number;
+    initializeBudget(unit: IUnit): number;
     consumeBudget(current: number, cost: number): Result<number>;
 }
 
 export interface GridMutator {
-    moveUnit(unit: Unit, newPosition: Coordinate): Result<void>;
+    moveUnit(unit: IUnit, newPosition: Coordinate): Result<void>;
     canOccupy(position: Coordinate): boolean;
 }

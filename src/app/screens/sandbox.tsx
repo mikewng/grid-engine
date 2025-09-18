@@ -156,7 +156,6 @@ const SandboxScreen = () => {
                 setSelectedTile(tile);
             } else {
                 console.log(`Movement failed: ${moveResult.err}`);
-                alert(`Movement failed: ${moveResult.err}`);
             }
         }
     };
