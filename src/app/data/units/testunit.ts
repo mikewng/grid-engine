@@ -18,7 +18,7 @@ export const testKnightUnit = new GameUnit(
         luck: 4,
         defense: 10,
         resistance: 3,
-        movement: 3
+        movement: 6
     },
     {
         levelGR: 100,

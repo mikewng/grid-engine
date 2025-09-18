@@ -93,6 +93,7 @@ const SandboxScreen = () => {
         }
     };
 
+
     const handleUnitDeselect = () => {
         setSelectedUnit(null);
         setMovementPath([]);
@@ -108,8 +109,7 @@ const SandboxScreen = () => {
                 <GeneralDebugger
                     onUnitDeselect={handleUnitDeselect}
                     selectedTile={selectedTile}
-                    selectedUnit={selectedUnit}
-                    testUnit={testUnit}
+                    selectedUnit={unitManager.getUnitById(selectedUnit ?? "").value}
                 />
             </div>
             <div className="ge-sandbox-content-container">

@@ -5,8 +5,7 @@ import "./generaldebugger.scss"
 
 interface GeneralDebuggerProps {
     selectedTile: Tile | null;
-    selectedUnit: string | null;
-    testUnit: IUnit;
+    selectedUnit: IUnit | undefined;
     onUnitDeselect: () => void;
 }
 
@@ -14,8 +13,7 @@ const GeneralDebugger: React.FC<GeneralDebuggerProps> =
     ({
         onUnitDeselect,
         selectedTile,
-        selectedUnit,
-        testUnit
+        selectedUnit
     }) => {
         return (
             <div className="general-debugger-wrapper">
@@ -29,12 +27,12 @@ const GeneralDebugger: React.FC<GeneralDebuggerProps> =
                             Type: {TileType[selectedTile.type]} |
                             Cost: {selectedTile.movementCost}
                         </div>
-                        {selectedTile.occupiedByUnitId && (
+                        {(selectedTile.occupiedByUnitId && selectedUnit) && (
                             <div className="ge-unit-info">
-                                Occupied by Unit: {testUnit.name} |
-                                Level: {testUnit.stats.level} |
-                                HP: {testUnit.stats.currentHealth}/{testUnit.stats.maxHealth} |
-                                Faction: {UnitFaction[testUnit.unitFaction]}
+                                Occupied by Unit: {selectedUnit.name} |
+                                Level: {selectedUnit.stats.level} |
+                                HP: {selectedUnit.stats.currentHealth}/{selectedUnit.stats.maxHealth} |
+                                Faction: {UnitFaction[selectedUnit.unitFaction]}
                             </div>
                         )}
                     </div>
@@ -50,9 +48,9 @@ const GeneralDebugger: React.FC<GeneralDebuggerProps> =
                             selectedUnit ?
                             <div className="ge-data">
                                 <div>
-                                    <strong>Selected Unit: {testUnit.name}</strong> |
-                                    Movement: {testUnit.stats.movement} |
-                                    Has Acted: {testUnit.hasActed ? 'Yes' : 'No'}
+                                    <strong>Selected Unit: {selectedUnit.name}</strong> |
+                                    Movement: {selectedUnit.stats.movement} |
+                                    Has Acted: {selectedUnit.hasActed ? 'Yes' : 'No'}
                                 </div>
                                 <button onClick={onUnitDeselect}>Deselect Unit</button>
                             </div>
