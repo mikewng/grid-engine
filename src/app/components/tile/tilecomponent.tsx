@@ -10,6 +10,7 @@ interface TileProps {
     isSelected?: boolean;
     isHighlighted?: boolean;
     isInMovementRange?: boolean;
+    isInAttackRange?: boolean;
 }
 
 const TileComponent: React.FC<TileProps> = memo(({
@@ -17,7 +18,8 @@ const TileComponent: React.FC<TileProps> = memo(({
     onClick,
     isSelected = false,
     isHighlighted = false,
-    isInMovementRange = false
+    isInMovementRange = false,
+    isInAttackRange = false
 }) => {
     const handleClick = useMemo(() => {
         return onClick ? () => onClick(tile) : undefined;
@@ -30,12 +32,13 @@ const TileComponent: React.FC<TileProps> = memo(({
             isSelected && "ge-tile-selected",
             isHighlighted && "ge-tile-highlighted",
             isInMovementRange && "ge-tile-movement-range",
+            isInAttackRange && "ge-tile-attack-range",
             tile.occupiedByUnitId && "ge-tile-occupied",
             onClick && "ge-tile-clickable"
         ].filter(Boolean).join(" ");
 
         return `${baseClass} ${typeClass} ${stateClasses}`.trim();
-    }, [tile.type, tile.occupiedByUnitId, isSelected, isHighlighted, isInMovementRange, onClick]);
+    }, [tile.type, tile.occupiedByUnitId, isSelected, isHighlighted, isInMovementRange, isInAttackRange, onClick]);
 
     const tileStyle = useMemo(() => ({
         position: 'relative' as const,

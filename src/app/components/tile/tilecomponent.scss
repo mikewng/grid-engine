@@ -40,6 +40,24 @@
         box-shadow: inset 0 0 10px rgba(0, 150, 255, 0.3);
     }
 
+    &.ge-tile-attack-range {
+        background-color: rgba(255, 0, 0, 0.4);
+        box-shadow: inset 0 0 10px rgba(255, 0, 0, 0.3);
+
+        &::after {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 8px;
+            height: 8px;
+            background-color: rgba(255, 0, 0, 0.8);
+            border-radius: 50%;
+            z-index: 1;
+        }
+    }
+
     &.ge-tile-clickable {
         cursor: pointer;
 
