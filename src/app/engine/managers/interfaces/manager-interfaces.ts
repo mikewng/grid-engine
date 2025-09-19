@@ -62,4 +62,7 @@ export interface ICombatManager {
     canCounterAttack(defender: IUnit, attacker: IUnit): boolean;
     calculateDamage(attacker: IUnit, defender: IUnit): number;
     damageUnit(id: string, dmg: number): void;
+    getAttackRange(unitId: string): Result<Coordinate[]>;
+    getAttackableTargets(unitId: string): Result<IUnit[]>;
+    canAttackTarget(attackerId: string, targetId: string): Result<boolean>;
 }

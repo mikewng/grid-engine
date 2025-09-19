@@ -1,11 +1,13 @@
-import { CombatResult, ICombatManager, IUnitManager } from "./interfaces/manager-interfaces";
+import { CombatResult, ICombatManager, IUnitManager, IGridManager } from "./interfaces/manager-interfaces";
 import { Result } from "../utils/resultclass";
-import { IUnit } from "../models/units/iunit";
+import { IUnit, UnitFaction } from "../models/units/iunit";
+import { Coordinate } from "../models/grid/coordinate";
 
 
 export class CombatManager implements ICombatManager {
     constructor(
         private units: IUnitManager,
+        private grid: IGridManager,
     ) { }
 
     initiateAttack(atk_id: string, def_id: string): Result<CombatResult> {
@@ -179,6 +181,118 @@ export class CombatManager implements ICombatManager {
         } else {
             this.units.patchUnit(id, { stats: { ...unit.value.stats, currentHealth: newHp } })
         }
+    }
+
+    getAttackRange(unitId: string): Result<Coordinate[]> {
+        const unitResult = this.units.getUnitById(unitId);
+        if (!unitResult.success || !unitResult.value) {
+            return Result.Fail("Unit not found");
+        }
+
+        const unit = unitResult.value;
+        const unitPos = unit.position;
+        const range = unit.equippedWeapon?.range || 1;
+        const attackRange: Coordinate[] = [];
+
+        // Calculate all tiles within attack range
+        for (let x = unitPos.x - range; x <= unitPos.x + range; x++) {
+            for (let y = unitPos.y - range; y <= unitPos.y + range; y++) {
+                // Skip the unit's own position
+                if (x === unitPos.x && y === unitPos.y) continue;
+
+                // Check if position is valid on the grid
+                const validResult = this.grid.isValidPosition(x, y);
+                if (!validResult.success || !validResult.value) continue;
+
+                // Calculate Manhattan distance for tactical RPG style range
+                const distance = Math.abs(x - unitPos.x) + Math.abs(y - unitPos.y);
+                if (distance <= range) {
+                    attackRange.push({ x, y });
+                }
+            }
+        }
+
+        return Result.Success(attackRange);
+    }
+
+    getAttackableTargets(unitId: string): Result<IUnit[]> {
+        const unitResult = this.units.getUnitById(unitId);
+        if (!unitResult.success || !unitResult.value) {
+            return Result.Fail("Unit not found");
+        }
+
+        const attacker = unitResult.value;
+        const attackRangeResult = this.getAttackRange(unitId);
+        if (!attackRangeResult.success || !attackRangeResult.value) {
+            return Result.Fail("Could not calculate attack range");
+        }
+
+        const attackRange = attackRangeResult.value;
+        const targets: IUnit[] = [];
+
+        // Check each tile in attack range for enemy units
+        for (const coord of attackRange) {
+            const unitAtPosResult = this.units.getUnitAtPosition(coord.x, coord.y);
+            if (unitAtPosResult.success && unitAtPosResult.value) {
+                const targetUnit = unitAtPosResult.value;
+                // Only target units from opposing factions
+                if (this.areOpposingFactions(attacker.unitFaction, targetUnit.unitFaction)) {
+                    targets.push(targetUnit);
+                }
+            }
+        }
+
+        return Result.Success(targets);
+    }
+
+    canAttackTarget(attackerId: string, targetId: string): Result<boolean> {
+        const attackerResult = this.units.getUnitById(attackerId);
+        const targetResult = this.units.getUnitById(targetId);
+
+        if (!attackerResult.success || !targetResult.success || !attackerResult.value || !targetResult.value) {
+            return Result.Fail("One or both units not found");
+        }
+
+        const attacker = attackerResult.value;
+        const target = targetResult.value;
+
+        // Check if units are from opposing factions
+        if (!this.areOpposingFactions(attacker.unitFaction, target.unitFaction)) {
+            return Result.Success(false);
+        }
+
+        // Check if target is within attack range
+        const attackRangeResult = this.getAttackRange(attackerId);
+        if (!attackRangeResult.success || !attackRangeResult.value) {
+            return Result.Fail("Could not calculate attack range");
+        }
+
+        const attackRange = attackRangeResult.value;
+        const targetPos = target.position;
+
+        const canAttack = attackRange.some(coord =>
+            coord.x === targetPos.x && coord.y === targetPos.y
+        );
+
+        return Result.Success(canAttack);
+    }
+
+    private areOpposingFactions(faction1: UnitFaction, faction2: UnitFaction): boolean {
+        // P1 and P2 are allied, both oppose ENEMY
+        // NEUTRAL doesn't attack anyone and isn't attacked
+        if (faction1 === UnitFaction.NEUTRAL || faction2 === UnitFaction.NEUTRAL) {
+            return false;
+        }
+
+        if ((faction1 === UnitFaction.P1 || faction1 === UnitFaction.P2) && faction2 === UnitFaction.ENEMY) {
+            return true;
+        }
+
+        if (faction1 === UnitFaction.ENEMY && (faction2 === UnitFaction.P1 || faction2 === UnitFaction.P2)) {
+            return true;
+        }
+
+        return false;
     }
 
 }

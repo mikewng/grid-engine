@@ -3,7 +3,8 @@ import { GridManager } from "../../engine/managers/gridmanager";
 import { UnitManager } from "../../engine/managers/unitmanager";
 import { MovementManager } from "../../engine/managers/movementmanager";
 import { PathfindingManager } from "../../engine/managers/pathfindingmanager";
-import { IGridManager, IUnitManager, IMovementManager } from "../../engine/managers/interfaces/manager-interfaces";
+import { CombatManager } from "../../engine/managers/combatmanager";
+import { IGridManager, IUnitManager, IMovementManager, ICombatManager } from "../../engine/managers/interfaces/manager-interfaces";
 import { BasicMovementCostCalculator } from "../../engine/managers/implementations/basic-movement-cost-calculator";
 import { BasicPathValidator } from "../../engine/managers/implementations/basic-path-validator";
 import { BasicMovementTracker } from "../../engine/managers/implementations/basic-movement-tracker";
@@ -14,6 +15,7 @@ export interface GameManagers {
     gridManager: IGridManager;
     unitManager: IUnitManager;
     movementManager: IMovementManager;
+    combatManager: ICombatManager;
 }
 
 export class GameSetup {
@@ -61,6 +63,11 @@ export class GameSetup {
             gridMutator
         );
 
-        return { gridManager, unitManager, movementManager };
+        const combatManager = new CombatManager(
+            unitManager,
+            gridManager
+        );
+
+        return { gridManager, unitManager, movementManager, combatManager };
     }
 }

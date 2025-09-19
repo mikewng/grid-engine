@@ -1,5 +1,6 @@
 import { UnitFaction } from "@/app/engine/models/units/iunit";
 import { Unit } from "@/app/engine/models/units/unit";
+import { testSword, testMagicTome, testBow } from "../items/testweapons";
 
 export const testKnightUnit = new Unit(
     "test-unit-1",
@@ -36,6 +37,8 @@ export const testKnightUnit = new Unit(
     UnitFaction.P1
 );
 
+// Equip the knight with a sword
+testKnightUnit.equippedWeapon = testSword;
 
 export const testMageUnit = new Unit(
     "test-unit-2",
@@ -72,6 +75,8 @@ export const testMageUnit = new Unit(
     UnitFaction.P1
 );
 
+// Equip the mage with a magic tome
+testMageUnit.equippedWeapon = testMagicTome;
 
 export const testEnemy = new Unit(
     "test-enemy-1",
@@ -107,3 +112,6 @@ export const testEnemy = new Unit(
     },
     UnitFaction.ENEMY
 );
+
+// Equip the enemy with a bow
+testEnemy.equippedWeapon = testBow;
