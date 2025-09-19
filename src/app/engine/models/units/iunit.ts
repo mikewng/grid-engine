@@ -1,4 +1,4 @@
-import { Item } from "../items/item";
+import { BaseItem } from "../items/item";
 import { WeaponItem } from "../items/weaponitem";
 import { UnitClass } from "./unitclass";
 import { UnitSkill } from "./unitskills";
@@ -13,7 +13,7 @@ export interface IUnit {
     growths: UnitGrowths;
     skills: UnitSkill[];
     equippedWeapon: WeaponItem | undefined;
-    items: Item[]
+    items: BaseItem[]
     range: number;
     isAlive: boolean;
     hasActed: boolean;
