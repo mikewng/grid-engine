@@ -4,6 +4,16 @@ import { IUnit, UnitFaction, UnitStats } from "../../models/units/iunit";
 import { Coordinate } from "../../models/grid/coordinate";
 import { Result } from "../../utils/resultclass";
 
+export interface CombatResult {
+    attackerDamageDealt: number;
+    defenderDamageDealt: number;
+    attackerHits: number;
+    defenderHits: number;
+    defenderKilled: boolean;
+    attackerKilled: boolean;
+}
+
+
 export interface IGridManager {
     buildGridFromArr(arr: string[][]): Result<boolean>;
     setGrid(grid: Grid): Result<boolean>;
@@ -40,4 +50,16 @@ export interface IPathfindingManager {
     getMovementRange(unitId: string): Result<Coordinate[]>;
     findPath(unitId: string, from: Coordinate, to: Coordinate): Result<Coordinate[]>;
     validatePath(path: Coordinate[], unitId: string): Result<void>;
+}
+
+export interface ICombatManager {
+    initiateAttack(atk_id: string, def_id: string): Result<CombatResult>;
+    calculateHitRate(attacker: IUnit, defender: IUnit): number;
+    calculateDoubleHit(attacker: IUnit, defender: IUnit): boolean;
+    calculateCritRate(unit: IUnit): number;
+    calculateHasHit(hitrate: number): boolean;
+    calculateHasCritHit(critrate: number): boolean;
+    canCounterAttack(defender: IUnit, attacker: IUnit): boolean;
+    calculateDamage(attacker: IUnit, defender: IUnit): number;
+    damageUnit(id: string, dmg: number): void;
 }

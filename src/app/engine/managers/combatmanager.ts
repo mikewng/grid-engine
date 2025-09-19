@@ -1,17 +1,9 @@
-import { IUnitManager } from "./interfaces/manager-interfaces";
+import { CombatResult, ICombatManager, IUnitManager } from "./interfaces/manager-interfaces";
 import { Result } from "../utils/resultclass";
 import { IUnit } from "../models/units/iunit";
 
-interface CombatResult {
-    attackerDamageDealt: number;
-    defenderDamageDealt: number;
-    attackerHits: number;
-    defenderHits: number;
-    defenderKilled: boolean;
-    attackerKilled: boolean;
-}
 
-export class CombatManager {
+export class CombatManager implements ICombatManager {
     constructor(
         private units: IUnitManager,
     ) { }

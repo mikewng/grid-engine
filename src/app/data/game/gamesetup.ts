@@ -1,4 +1,4 @@
-import { Unit } from "../../engine/models/units/unit";
+import { IUnit } from "../../engine/models/units/iunit";
 import { GridManager } from "../../engine/managers/gridmanager";
 import { UnitManager } from "../../engine/managers/unitmanager";
 import { MovementManager } from "../../engine/managers/movementmanager";
@@ -17,7 +17,7 @@ export interface GameManagers {
 }
 
 export class GameSetup {
-    static initializeManagers(gridArray: string[][], units: Unit[]): GameManagers {
+    static initializeManagers(gridArray: string[][], units: IUnit[]): GameManagers {
         const gridManager = new GridManager();
         const unitManager = new UnitManager();
 
