@@ -2,11 +2,11 @@ import { Coordinate } from "../../models/grid/coordinate";
 import { IUnit } from "../../models/units/iunit";
 import { Result } from "../../utils/resultclass";
 import { PathfindingService, MovementCostCalculator, PathValidator } from "../interfaces/movement-interfaces";
-import { GridManager } from "../gridmanager";
+import { IGridManager } from "../interfaces/manager-interfaces";
 
 export class BasicPathfindingService implements PathfindingService {
     constructor(
-        private gridManager: GridManager,
+        private gridManager: IGridManager,
         private costCalculator: MovementCostCalculator,
         private pathValidator: PathValidator
     ) {}

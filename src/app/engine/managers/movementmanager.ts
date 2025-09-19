@@ -1,14 +1,13 @@
 import { Coordinate } from "../models/grid/coordinate";
 import { Result } from "../utils/resultclass";
-import { UnitManager } from "./unitmanager";
+import { IUnitManager, IMovementManager, IPathfindingManager } from "./interfaces/manager-interfaces";
 import { GridMutator } from "./interfaces/movement-interfaces";
 import { IUnit } from "../models/units/iunit";
-import { PathfindingManager } from "./pathfindingmanager";
 
-export class MovementManager {
+export class MovementManager implements IMovementManager {
     constructor(
-        private units: UnitManager,
-        private pathfindingManager: PathfindingManager,
+        private units: IUnitManager,
+        private pathfindingManager: IPathfindingManager,
         private gridMutator: GridMutator
     ) { }
 

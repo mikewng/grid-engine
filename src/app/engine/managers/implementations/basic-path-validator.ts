@@ -1,11 +1,11 @@
 import { Coordinate } from "../../models/grid/coordinate";
-import { GridManager } from "../gridmanager";
+import { IGridManager } from "../interfaces/manager-interfaces";
 import { PathValidator } from "../interfaces/movement-interfaces";
 import { Result } from "../../utils/resultclass";
 import { IUnit } from "../../models/units/iunit";
 
 export class BasicPathValidator implements PathValidator {
-    constructor(private gridManager: GridManager) {}
+    constructor(private gridManager: IGridManager) {}
 
     validatePath(path: Coordinate[], unit: IUnit): Result<void> {
         if (path.length === 0) {

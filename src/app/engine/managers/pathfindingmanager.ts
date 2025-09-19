@@ -1,7 +1,6 @@
 import { Coordinate } from "../models/grid/coordinate";
 import { Result } from "../utils/resultclass";
-import { GridManager } from "./gridmanager";
-import { UnitManager } from "./unitmanager";
+import { IGridManager, IUnitManager, IPathfindingManager } from "./interfaces/manager-interfaces";
 import {
     MovementCostCalculator,
     PathValidator,
@@ -10,10 +9,10 @@ import {
 } from "./interfaces/movement-interfaces";
 import { IUnit } from "../models/units/iunit";
 
-export class PathfindingManager {
+export class PathfindingManager implements IPathfindingManager {
     constructor(
-        private units: UnitManager,
-        private grid: GridManager,
+        private units: IUnitManager,
+        private grid: IGridManager,
         private costCalculator: MovementCostCalculator,
         private pathValidator: PathValidator,
         private movementTracker: MovementTracker,

@@ -4,8 +4,9 @@ import { Tile } from "../models/grid/tile";
 import { TileDictionary } from "@/app/data/grid/tileDictionary";
 import { movementCostMap } from "@/app/data/grid/tileDictionary";
 import { Result } from "../utils/resultclass";
+import { IGridManager } from "./interfaces/manager-interfaces";
 
-export class GridManager {
+export class GridManager implements IGridManager {
     private grid: Grid | null = null;
 
     // Generic Functions

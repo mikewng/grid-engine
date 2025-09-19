@@ -4,6 +4,7 @@ import { GridManager } from "../../engine/managers/gridmanager";
 import { UnitManager } from "../../engine/managers/unitmanager";
 import { MovementManager } from "../../engine/managers/movementmanager";
 import { PathfindingManager } from "../../engine/managers/pathfindingmanager";
+import { IGridManager, IUnitManager, IMovementManager } from "../../engine/managers/interfaces/manager-interfaces";
 import { BasicMovementCostCalculator } from "../../engine/managers/implementations/basic-movement-cost-calculator";
 import { BasicPathValidator } from "../../engine/managers/implementations/basic-path-validator";
 import { BasicMovementTracker } from "../../engine/managers/implementations/basic-movement-tracker";
@@ -11,9 +12,9 @@ import { BasicGridMutator } from "../../engine/managers/implementations/basic-gr
 import { BasicPathfindingService } from "../../engine/managers/implementations/basic-pathfinding-service";
 
 export interface GameManagers {
-    gridManager: GridManager;
-    unitManager: UnitManager;
-    movementManager: MovementManager;
+    gridManager: IGridManager;
+    unitManager: IUnitManager;
+    movementManager: IMovementManager;
 }
 
 export class GameSetup {

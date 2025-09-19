@@ -1,14 +1,13 @@
 import { Coordinate } from "../../models/grid/coordinate";
-import { GridManager } from "../gridmanager";
-import { UnitManager } from "../unitmanager";
+import { IGridManager, IUnitManager } from "../interfaces/manager-interfaces";
 import { GridMutator } from "../interfaces/movement-interfaces";
 import { Result } from "../../utils/resultclass";
 import { IUnit } from "../../models/units/iunit";
 
 export class BasicGridMutator implements GridMutator {
     constructor(
-        private gridManager: GridManager,
-        private unitManager: UnitManager
+        private gridManager: IGridManager,
+        private unitManager: IUnitManager
     ) {}
 
     moveUnit(unit: IUnit, newPosition: Coordinate): Result<void> {

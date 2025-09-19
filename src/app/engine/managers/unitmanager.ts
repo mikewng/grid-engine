@@ -1,7 +1,8 @@
 import { IUnit, UnitFaction, UnitStats } from "../models/units/iunit";
 import { Result } from "../utils/resultclass";
+import { IUnitManager } from "./interfaces/manager-interfaces";
 
-export class UnitManager {
+export class UnitManager implements IUnitManager {
     private units: Map<string, IUnit> = new Map();
 
 
@@ -72,11 +73,25 @@ export class UnitManager {
     }
 
     // BUSINESS LOGIC
-    markUnitActed(id: string): Result<IUnit> {
+    markUnitActed(id: string): Result<boolean> {
         const unit = this.getUnitById(id);
         if (!unit.value) return Result.Fail("Could not find unit by given ID.");
         this.setUnit({ ...unit.value, hasActed: true })
 
-        return Result.Success(unit.value)
+        return Result.Success(true)
+    }
+
+    markUnitUnacted(id: string): Result<boolean> {
+        const unit = this.getUnitById(id);
+        if (!unit.value) return Result.Fail("Could not find unit by given ID.");
+        this.setUnit({ ...unit.value, hasActed: false })
+
+        return Result.Success(true)
+    }
+
+    isUnitActed(id: string): Result<boolean> {
+        const unit = this.getUnitById(id);
+        if (!unit.value) return Result.Fail("Could not find unit by given ID.");
+        return Result.Success(unit.value.hasActed)
     }
 }
