@@ -4,7 +4,7 @@ import { UnitSkill } from "./unitskills";
 import { WeaponItem } from "../items/weaponitem";
 import { Item } from "../items/item";
 
-export class GameUnit implements IUnit {
+export class Unit implements IUnit {
     readonly id: string;
     readonly unitTypeId: string;
     name: string;
@@ -160,8 +160,8 @@ export class GameUnit implements IUnit {
         return { ...this.stats };
     }
 
-    clone(): GameUnit {
-        const cloned = new GameUnit(
+    clone(): Unit {
+        const cloned = new Unit(
             this.id,
             this.unitTypeId,
             this.name,

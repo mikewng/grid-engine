@@ -1,7 +1,7 @@
 import { UnitFaction } from "@/app/engine/models/units/iunit";
-import { GameUnit } from "@/app/engine/models/units/unit";
+import { Unit } from "@/app/engine/models/units/unit";
 
-export const testKnightUnit = new GameUnit(
+export const testKnightUnit = new Unit(
     "test-unit-1",
     "knight",
     "Test Knight",
@@ -37,7 +37,7 @@ export const testKnightUnit = new GameUnit(
 );
 
 
-export const testMageUnit = new GameUnit(
+export const testMageUnit = new Unit(
     "test-unit-2",
     "mage",
     "Test Mage",
@@ -73,7 +73,7 @@ export const testMageUnit = new GameUnit(
 );
 
 
-export const testEnemy = new GameUnit(
+export const testEnemy = new Unit(
     "test-enemy-1",
     "mage",
     "Test Enemy",
