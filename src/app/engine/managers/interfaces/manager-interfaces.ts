@@ -26,6 +26,7 @@ export interface IUnitManager {
     getAliveUnits(): Result<IUnit[]>;
     markUnitActed(id: string): Result<boolean>;
     markUnitUnacted(id: string): Result<boolean>;
+    patchUnit(id: string, changes: Partial<IUnit>): Result<IUnit>;
     isUnitActed(id: string): Result<boolean>;
     setUnitPosition(id: string, x: number, y: number): Result<boolean>;
 }

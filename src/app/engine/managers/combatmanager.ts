@@ -1,4 +1,4 @@
-import { UnitManager } from "./unitmanager";
+import { IUnitManager } from "./interfaces/manager-interfaces";
 import { Result } from "../utils/resultclass";
 import { IUnit } from "../models/units/iunit";
 
@@ -13,7 +13,7 @@ interface CombatResult {
 
 export class CombatManager {
     constructor(
-        private units: UnitManager,
+        private units: IUnitManager,
     ) { }
 
     initiateAttack(atk_id: string, def_id: string): Result<CombatResult> {
