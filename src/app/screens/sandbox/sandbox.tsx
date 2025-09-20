@@ -13,10 +13,12 @@ import { Coordinate } from "../../engine/models/grid/coordinate";
 // UI Components
 import GridComponent from "@/app/components/grid/gridcomponent";
 import GeneralDebugger from "@/app/screens/sandbox/components/uidebug/generaldebugger";
+import SandboxControls from "@/app/screens/sandbox/components/uidebug/sandboxcontrols";
 // CSS
 import "./sandbox.scss"
 import CombatUI from "@/app/components/combat/combatui";
 import UnitStatsUI from "@/app/components/unit/unitstatsui";
+import CombatResultsUI from "./components/uidebug/combatresultsui";
 
 const SandboxScreen = () => {
     const testUnits = useMemo(() => {
@@ -146,86 +148,27 @@ const SandboxScreen = () => {
             <h1>Grid Engine Combat Test</h1>
             <p>{`${testGridArr.length}x${testGridArr[0].length} Testing Grid`}</p>
 
-            <div className="ge-sandbox-controls">
-                <div style={{ marginBottom: '10px' }}>
-                    <span style={{
-                        padding: '8px 16px',
-                        backgroundColor: gamePhase === 'select' ? '#2196F3' : gamePhase === 'move' ? '#4CAF50' : '#f44336',
-                        color: 'white',
-                        borderRadius: '4px',
-                        marginRight: '10px'
-                    }}>
-                        Phase: {gamePhase === 'select' ? 'Select Unit' : gamePhase === 'move' ? 'Move' : 'Attack'}
-                    </span>
-                    {selectedUnit && gamePhase === 'move' && (
-                        <button
-                            onClick={skipToAttack}
-                            style={{
-                                padding: '8px 16px',
-                                backgroundColor: '#FF9800',
-                                color: 'white',
-                                border: 'none',
-                                borderRadius: '4px',
-                                cursor: 'pointer',
-                                marginRight: '10px'
-                            }}
-                        >
-                            Skip to Attack
-                        </button>
-                    )}
-                    <button
-                        onClick={handleUnitDeselect}
-                        style={{
-                            padding: '8px 16px',
-                            backgroundColor: '#9E9E9E',
-                            color: 'white',
-                            border: 'none',
-                            borderRadius: '4px',
-                            cursor: 'pointer'
-                        }}
-                    >
-                        Deselect All
-                    </button>
-                </div>
-                {selectedUnit && (
-                    <p>Selected Unit: {selectedUnit}</p>
-                )}
-                {targetUnit && (
-                    <p>Target: {targetUnit}</p>
-                )}
-                <p style={{ fontSize: '14px', color: '#666' }}>
-                    {gamePhase === 'select' && 'Click a unit to select it'}
-                    {gamePhase === 'move' && 'Click an empty tile to move, or skip to attack'}
-                    {gamePhase === 'attack' && 'Click an enemy unit to attack it'}
-                </p>
-            </div>
-
-            {combatResult && (
-                <div style={{
-                    backgroundColor: '#f5f5f5',
-                    border: '1px solid #ddd',
-                    padding: '15px',
-                    margin: '10px 0',
-                    borderRadius: '4px'
-                }}>
-                    <h3>Combat Result</h3>
-                    <p>Attacker Damage Dealt: {combatResult.attackerDamageDealt}</p>
-                    <p>Defender Damage Dealt: {combatResult.defenderDamageDealt}</p>
-                    <p>Attacker Hits: {combatResult.attackerHits}</p>
-                    <p>Defender Hits: {combatResult.defenderHits}</p>
-                    <p>Defender Killed: {combatResult.defenderKilled ? 'Yes' : 'No'}</p>
-                    <p>Attacker Killed: {combatResult.attackerKilled ? 'Yes' : 'No'}</p>
-                </div>
-            )}
-
-            <div className="ge-sandbox-header-container">
-                <GeneralDebugger
+            <div className="debug-ui-container">
+                <SandboxControls
+                    gamePhase={gamePhase}
+                    selectedUnit={selectedUnit}
+                    targetUnit={targetUnit}
+                    onSkipToAttack={skipToAttack}
                     onUnitDeselect={handleUnitDeselect}
-                    selectedTile={selectedTile}
-                    selectedUnit={unitManager.getUnitById(selectedUnit ?? "").value}
                 />
-            </div>
 
+                {combatResult && (
+                    <CombatResultsUI combatResult={combatResult} />
+                )}
+
+                <div className="ge-sandbox-header-container">
+                    <GeneralDebugger
+                        onUnitDeselect={handleUnitDeselect}
+                        selectedTile={selectedTile}
+                        selectedUnit={unitManager.getUnitById(selectedUnit ?? "").value}
+                    />
+                </div>
+            </div>
             <div className="ge-sandbox-content-container">
                 {(() => {
                     const gridResult = gridManager.getGrid();

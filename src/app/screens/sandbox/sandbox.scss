@@ -10,4 +10,16 @@
     .ge-sandbox-combat-container {
         position: relative;
     }
+
+    .debug-ui-container {
+        display: flex;
+        position: absolute;
+        bottom: 0;
+        gap: 1rem;
+
+        z-index: 2000;
+        background-color: white;
+        border: 1px solid black;
+        padding: 1rem;
+    }
 }
