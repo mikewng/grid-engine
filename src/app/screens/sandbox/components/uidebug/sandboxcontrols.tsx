@@ -1,5 +1,5 @@
 interface SandboxControlsProps {
-    gamePhase: 'select' | 'move' | 'attack';
+    gamePhase: 'select' | 'move' | 'attack' | 'enemy_turn' | 'game_over';
     selectedUnit: string | null;
     targetUnit: string | null;
     onSkipToAttack: () => void;

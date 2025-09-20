@@ -72,11 +72,11 @@ const TileComponent: React.FC<TileProps> = memo(({
                 {tile.occupiedByUnitId && (
                     <div className="ge-tile-unit-indicator" />
                 )}
-                {process.env.NODE_ENV === 'development' && (
+                {/* {process.env.NODE_ENV === 'development' && (
                     <div className="ge-tile-debug-info">
                         <span className="ge-tile-coords">{tile.x},{tile.y}</span>
                     </div>
-                )}
+                )} */}
             </div>
         </div>
     );
