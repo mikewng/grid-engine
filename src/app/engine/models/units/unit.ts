@@ -2,7 +2,7 @@ import { UnitStats, UnitGrowths, UnitStatusEffect, UnitStatusType, UnitFaction, 
 import { UnitClass } from "./unitclass";
 import { UnitSkill } from "./unitskills";
 import { WeaponItem } from "../items/weaponitem";
-import { Item } from "../items/item";
+import { BaseItem } from "../items/item";
 
 export class Unit implements IUnit {
     readonly id: string;
@@ -14,7 +14,7 @@ export class Unit implements IUnit {
     growths: UnitGrowths;
     skills: UnitSkill[];
     equippedWeapon: WeaponItem | undefined;
-    items: Item[];
+    items: BaseItem[];
     range: number;
     isAlive: boolean;
     hasActed: boolean;
@@ -59,7 +59,7 @@ export class Unit implements IUnit {
         this.range = 1;
     }
 
-    addItem(item: Item): void {
+    addItem(item: BaseItem): void {
         this.items.push(item);
     }
 
