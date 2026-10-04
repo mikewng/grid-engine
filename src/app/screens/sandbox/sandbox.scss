@@ -1,25 +1,629 @@
-.ge-sandbox-wrapper {
+.ge-loading {
+    padding: 3rem;
+    text-align: center;
+    color: var(--ge-text-muted);
+}
+
+.ge-sandbox {
+    max-width: 1640px;
+    margin: 0 auto;
+    padding: 1rem 1.25rem 2rem;
+
+    // Text colored by faction, used across the panels
+    .faction-p1 { --faction: var(--ge-player); }
+    .faction-p2 { --faction: var(--ge-ally); }
+    .faction-enemy { --faction: var(--ge-enemy); }
+    .faction-neutral { --faction: var(--ge-neutral); }
+}
+
+// --- Header ---
+
+.ge-sandbox-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.75rem 1.5rem;
+    margin-bottom: 1rem;
+
+    h1 {
+        margin: 0;
+        font-size: 1.35rem;
+        letter-spacing: 0.02em;
+    }
+
+    p {
+        margin: 0.1rem 0 0;
+        font-size: 0.85rem;
+        color: var(--ge-text-muted);
+    }
+}
+
+.ge-brand {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.ge-brand-mark {
+    width: 1.9rem;
+    height: 1.9rem;
+    border-radius: 6px;
+    transform: rotate(45deg);
+    background:
+        linear-gradient(135deg, var(--ge-gold) 0 50%, transparent 50%),
+        linear-gradient(135deg, var(--ge-player) 0%, var(--ge-player-dark) 100%);
+    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.15), 0 6px 16px rgba(0, 0, 0, 0.4);
+}
+
+.ge-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem 1rem;
+    font-size: 0.8rem;
+    color: var(--ge-text-muted);
+
+    span {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+    }
+
+    i {
+        width: 0.9rem;
+        height: 0.9rem;
+        border-radius: 3px;
+    }
+
+    .sw-move { background: rgb(40, 125, 255); box-shadow: inset 0 0 0 1px rgba(200, 225, 255, 0.8); }
+    .sw-attack { background: rgb(240, 55, 40); box-shadow: inset 0 0 0 1px rgba(255, 200, 200, 0.8); }
+    .sw-danger { background: repeating-linear-gradient(135deg, rgba(196, 40, 120, 0.9) 0 3px, rgba(196, 40, 120, 0.3) 3px 6px); }
+}
+
+// --- Layout ---
+
+.ge-sandbox-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 380px;
+    gap: 1.25rem;
+    align-items: start;
+}
+
+.ge-sandbox-map {
+    min-width: 0;
+}
+
+.ge-sandbox-side {
     display: flex;
     flex-direction: column;
-    align-items: center;
+    gap: 0.85rem;
+    position: sticky;
+    top: 1rem;
+    max-height: calc(100vh - 2rem);
+    overflow-y: auto;
+    padding-right: 0.25rem;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+}
 
-    .ge-sandbox-content-container {
-        border: 1px solid black;
+@media (max-width: 1100px) {
+    .ge-sandbox-layout {
+        grid-template-columns: minmax(0, 1fr);
     }
 
-    .ge-sandbox-combat-container {
-        position: relative;
+    .ge-sandbox-side {
+        position: static;
+        max-height: none;
+        overflow: visible;
+        padding-right: 0;
     }
+}
 
-    .debug-ui-container {
+@media (max-width: 600px) {
+    .ge-sandbox {
+        padding: 0.75rem 0.5rem 1.5rem;
+    }
+}
+
+// --- Panels ---
+
+.ge-panel {
+    border-radius: var(--ge-radius);
+    background: var(--ge-panel);
+    border: 1px solid var(--ge-panel-border);
+    padding: 0.85rem;
+}
+
+.ge-panel-title {
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ge-gold);
+    margin-bottom: 0.5rem;
+}
+
+.ge-turn-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+
+    .ge-turn-row {
         display: flex;
-        position: absolute;
-        bottom: 0;
-        gap: 1rem;
+        align-items: center;
+        justify-content: space-between;
+    }
 
-        z-index: 2000;
-        background-color: white;
-        border: 1px solid black;
-        padding: 1rem;
+    .ge-turn-label {
+        font-size: 0.7rem;
+        font-weight: 700;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--ge-text-muted);
+    }
+
+    .ge-turn-number {
+        font-size: 2rem;
+        font-weight: 800;
+        line-height: 1;
+    }
+
+    .ge-phase-pill {
+        padding: 0.35rem 0.8rem;
+        border-radius: 99px;
+        font-size: 0.85rem;
+        font-weight: 700;
+        color: #fff;
+        background: var(--faction, #555);
+        box-shadow: 0 0 18px color-mix(in srgb, var(--faction, #555) 45%, transparent);
+
+        &.is-over {
+            background: rgba(255, 255, 255, 0.12);
+            box-shadow: none;
+        }
+    }
+
+    .ge-ready {
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+        font-size: 0.85rem;
+        color: var(--ge-text-muted);
+    }
+
+    .ge-ready-dots {
+        display: flex;
+        gap: 0.25rem;
+
+        span {
+            width: 0.6rem;
+            height: 0.6rem;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.15);
+
+            &.is-ready {
+                background: var(--ge-gold);
+                box-shadow: 0 0 6px var(--ge-gold);
+            }
+        }
+    }
+
+    .ge-hint {
+        margin: 0;
+        font-size: 0.9rem;
+        line-height: 1.4;
+        padding: 0.6rem 0.7rem;
+        border-radius: 8px;
+        background: rgba(0, 0, 0, 0.22);
+        border-left: 3px solid var(--ge-gold);
+    }
+
+    .ge-end-turn {
+        width: 100%;
+        padding: 0.7rem;
+        font-size: 1rem;
+
+        &.is-nudging {
+            animation: ge-nudge 1.2s ease-in-out infinite;
+        }
+    }
+
+    .ge-turn-buttons {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.5rem;
+    }
+
+    .ge-toggles {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.4rem 1.1rem;
+        font-size: 0.82rem;
+        color: var(--ge-text-muted);
+
+        label {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            cursor: pointer;
+        }
+
+        input {
+            accent-color: var(--ge-gold);
+            width: 0.95rem;
+            height: 0.95rem;
+        }
+    }
+}
+
+@keyframes ge-nudge {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(77, 141, 255, 0.6); }
+    50% { box-shadow: 0 0 0 6px rgba(77, 141, 255, 0); }
+}
+
+.ge-terrain {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+
+    .ge-terrain-swatch {
+        flex: none;
+        width: 3.2rem;
+        height: 3.2rem;
+        border-radius: 8px;
+        box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.4), inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+    }
+
+    .ge-terrain-body {
+        flex: 1;
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+    }
+
+    .ge-terrain-head {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+    }
+
+    .ge-terrain-name {
+        font-weight: 700;
+    }
+
+    .ge-terrain-coords {
+        font-size: 0.75rem;
+        color: var(--ge-text-muted);
+    }
+
+    .ge-terrain-bonuses,
+    .ge-terrain-costs {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.2rem 0.75rem;
+        font-size: 0.8rem;
+        color: var(--ge-text-muted);
+
+        strong {
+            color: var(--ge-text);
+        }
+    }
+
+    .ge-terrain-costs .is-highlight {
+        color: var(--ge-gold);
+
+        strong {
+            color: var(--ge-gold);
+        }
+    }
+}
+
+.ge-log {
+    ol {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        max-height: 15rem;
+        overflow-y: auto;
+        scrollbar-width: thin;
+        scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+    }
+
+    li {
+        font-size: 0.82rem;
+        line-height: 1.35;
+        padding: 0.3rem 0.1rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        color: var(--ge-text-muted);
+
+        b {
+            color: var(--faction, var(--ge-text));
+            font-weight: 600;
+        }
+    }
+
+    .ge-log-phase {
+        margin-top: 0.35rem;
+        padding: 0.25rem 0.5rem;
+        border: 0;
+        border-radius: 6px;
+        font-size: 0.72rem;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--faction);
+        background: color-mix(in srgb, var(--faction) 14%, transparent);
+    }
+
+    .ge-log-crit {
+        color: var(--ge-warn);
+        font-weight: 600;
+    }
+
+    .ge-log-defeat {
+        color: #ff9c9c;
+    }
+
+    .ge-log-end {
+        color: var(--ge-gold);
+        font-weight: 700;
+    }
+}
+
+.ge-help,
+.ge-debug {
+    summary {
+        cursor: pointer;
+        font-weight: 600;
+        font-size: 0.9rem;
+    }
+
+    &[open] summary {
+        margin-bottom: 0.6rem;
+    }
+}
+
+.ge-help ol {
+    margin: 0;
+    padding-left: 1.2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    font-size: 0.85rem;
+    line-height: 1.4;
+    color: var(--ge-text-muted);
+
+    b {
+        color: var(--ge-text);
+    }
+}
+
+.ge-debug > * + * {
+    margin-top: 0.5rem;
+}
+
+// --- Windows over the map (inside GridComponent's overlay layer) ---
+
+.ge-action-menu {
+    position: absolute;
+    z-index: 7;
+    pointer-events: auto;
+    display: flex;
+    flex-direction: column;
+    min-width: 8.5rem;
+    padding: 0.3rem;
+    border-radius: 10px;
+    background: linear-gradient(180deg, var(--ge-window-top) 0%, var(--ge-window-bottom) 100%);
+    border: 1px solid var(--ge-gold-soft);
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.5), 0 12px 28px rgba(0, 0, 0, 0.55);
+    animation: ge-menu-in 140ms ease-out;
+
+    button {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        padding: 0.5rem 0.65rem 0.5rem 1.2rem;
+        border: 0;
+        border-radius: 7px;
+        background: transparent;
+        color: var(--ge-text);
+        font-weight: 600;
+        text-align: left;
+        cursor: pointer;
+        position: relative;
+
+        &::before {
+            content: "▶";
+            position: absolute;
+            left: 0.4rem;
+            font-size: 0.55rem;
+            color: var(--ge-gold);
+            opacity: 0;
+            transition: opacity 100ms ease;
+        }
+
+        &:hover,
+        &:focus-visible {
+            outline: none;
+            background: rgba(255, 255, 255, 0.1);
+
+            &::before {
+                opacity: 1;
+            }
+        }
+
+        &.is-attack {
+            color: #ffb0a8;
+        }
+
+        &.is-cancel {
+            color: var(--ge-text-muted);
+        }
+    }
+}
+
+@keyframes ge-menu-in {
+    from { opacity: 0; scale: 0.94; }
+    to { opacity: 1; scale: 1; }
+}
+
+.ge-phase-banner {
+    position: absolute;
+    inset: 0;
+    z-index: 9;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+
+    --band: rgba(36, 86, 190, 0.85);
+    &.tone-enemy { --band: rgba(170, 30, 40, 0.85); }
+    &.tone-ally { --band: rgba(30, 130, 75, 0.85); }
+    &.tone-neutral { --band: rgba(160, 110, 20, 0.85); }
+
+    .ge-phase-banner-band {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: calc(var(--tile) * 0.35) 0;
+        background: linear-gradient(90deg, transparent 0%, var(--band) 18%, var(--band) 82%, transparent 100%);
+        border-top: 2px solid rgba(255, 255, 255, 0.35);
+        border-bottom: 2px solid rgba(255, 255, 255, 0.35);
+        animation: ge-banner 1.15s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+    }
+
+    .ge-phase-banner-title {
+        font-size: clamp(1.4rem, calc(var(--tile) * 0.95), 3.2rem);
+        font-weight: 900;
+        font-style: italic;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: #fff;
+        text-shadow: 0 3px 0 rgba(0, 0, 0, 0.35), 0 0 24px rgba(255, 255, 255, 0.35);
+    }
+
+    .ge-phase-banner-sub {
+        font-size: clamp(0.75rem, calc(var(--tile) * 0.32), 1.1rem);
+        font-weight: 600;
+        letter-spacing: 0.3em;
+        text-transform: uppercase;
+        color: rgba(255, 255, 255, 0.85);
+    }
+}
+
+@keyframes ge-banner {
+    0% { transform: translateX(-60%); opacity: 0; }
+    20% { transform: translateX(0); opacity: 1; }
+    80% { transform: translateX(0); opacity: 1; }
+    100% { transform: translateX(60%); opacity: 0; }
+}
+
+.ge-game-over {
+    position: absolute;
+    inset: 0;
+    z-index: 10;
+    pointer-events: auto;
+    display: grid;
+    place-items: center;
+    background: rgba(5, 8, 18, 0.55);
+    backdrop-filter: blur(2px);
+    animation: ge-fade-in 300ms ease-out;
+
+    .ge-game-over-card {
+        min-width: min(22rem, 90%);
+        padding: 1.75rem 2.25rem;
+        text-align: center;
+        border-radius: 16px;
+        background: linear-gradient(180deg, var(--ge-window-top) 0%, var(--ge-window-bottom) 100%);
+        border: 1px solid var(--ge-gold-soft);
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+        animation: ge-pop-in 380ms cubic-bezier(0.2, 1.4, 0.4, 1);
+
+        p {
+            margin: 0.4rem 0 1.25rem;
+            color: var(--ge-text-muted);
+        }
+    }
+
+    .ge-game-over-title {
+        font-size: 2.6rem;
+        font-weight: 900;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+    }
+
+    &.is-victory .ge-game-over-title {
+        color: var(--ge-gold);
+        text-shadow: 0 0 28px rgba(230, 201, 119, 0.5);
+    }
+
+    &.is-defeat .ge-game-over-title {
+        color: var(--ge-bad);
+        text-shadow: 0 0 28px rgba(255, 93, 93, 0.45);
+    }
+}
+
+@keyframes ge-fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes ge-pop-in {
+    from { opacity: 0; transform: scale(0.85); }
+    to { opacity: 1; transform: none; }
+}
+
+.ge-toast {
+    position: absolute;
+    top: 3%;
+    left: 50%;
+    z-index: 11;
+    max-width: 80%;
+    padding: 0.55rem 0.9rem;
+    border-radius: 10px;
+    background: rgba(48, 12, 18, 0.95);
+    border: 1px solid rgba(255, 93, 93, 0.6);
+    box-shadow: 0 10px 26px rgba(0, 0, 0, 0.5);
+    font-size: 0.88rem;
+    transform: translateX(-50%);
+    animation: ge-toast-in 200ms ease-out;
+}
+
+@keyframes ge-toast-in {
+    from { opacity: 0; transform: translate(-50%, -8px); }
+    to { opacity: 1; transform: translate(-50%, 0); }
+}
+
+.ge-skip {
+    position: absolute;
+    top: 2.5%;
+    right: 1.5%;
+    z-index: 11;
+    pointer-events: auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.35rem 0.75rem;
+    border-radius: 99px;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    background: rgba(8, 12, 24, 0.75);
+    color: var(--ge-text);
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+
+    &:hover {
+        background: rgba(8, 12, 24, 0.9);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .ge-phase-banner .ge-phase-banner-band,
+    .ge-turn-panel .ge-end-turn.is-nudging,
+    .ge-game-over,
+    .ge-game-over .ge-game-over-card {
+        animation: none;
     }
 }

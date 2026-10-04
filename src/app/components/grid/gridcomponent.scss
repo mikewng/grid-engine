@@ -1,4 +1,32 @@
-.ge-grid-component-wrapper {
-    display: flex;
-    padding: 1rem;
+.ge-board {
+    position: relative;
+    // As wide as the space allows, but never taller than the window
+    width: min(100%, calc((100vh - 9rem) * var(--cols) / var(--rows)));
+    aspect-ratio: var(--cols) / var(--rows);
+    margin: 0 auto;
+    border-radius: 6px;
+    overflow: hidden;
+    container-type: inline-size;
+    user-select: none;
+    box-shadow:
+        0 0 0 2px rgba(0, 0, 0, 0.55),
+        0 0 0 4px var(--ge-gold-soft),
+        0 18px 40px rgba(0, 0, 0, 0.55);
+
+    .ge-board-tiles {
+        display: grid;
+        grid-template-columns: repeat(var(--cols), 1fr);
+        grid-template-rows: repeat(var(--rows), 1fr);
+        width: 100%;
+        height: 100%;
+    }
+
+    // Everything drawn on top of the map. Children opt back in to pointer events.
+    .ge-board-layer {
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        // One tile, for sizing text and icons that scale with the map
+        --tile: calc(100cqw / var(--cols));
+    }
 }

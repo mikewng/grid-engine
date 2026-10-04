@@ -1,5 +1,119 @@
+:root {
+    --ge-bg: #0b1020;
+    --ge-bg-glow: #18244a;
+    --ge-panel: rgba(19, 27, 49, 0.92);
+    --ge-panel-raised: #1c2846;
+    --ge-panel-border: rgba(160, 180, 230, 0.16);
+    --ge-window-top: #27406f;
+    --ge-window-bottom: #172644;
+    --ge-gold: #e6c977;
+    --ge-gold-soft: rgba(230, 201, 119, 0.35);
+    --ge-text: #e8edf7;
+    --ge-text-muted: #95a3c2;
+    --ge-player: #4d8dff;
+    --ge-player-dark: #1f4fbf;
+    --ge-enemy: #ff5d5d;
+    --ge-enemy-dark: #b8232d;
+    --ge-ally: #3fc27a;
+    --ge-ally-dark: #1d7d47;
+    --ge-neutral: #f0b43c;
+    --ge-neutral-dark: #a8720f;
+    --ge-good: #52d273;
+    --ge-warn: #f2c84b;
+    --ge-bad: #ff5d5d;
+    --ge-radius: 12px;
+}
+
+* {
+    box-sizing: border-box;
+}
+
 body {
-    display: flex;
-    justify-content: center;
+    margin: 0;
+    min-height: 100vh;
+    color: var(--ge-text);
+    background:
+        radial-gradient(ellipse at 30% -10%, var(--ge-bg-glow) 0%, transparent 60%),
+        var(--ge-bg);
+    font-family: var(--font-geist-sans), system-ui, -apple-system, "Segoe UI", sans-serif;
+    font-variant-numeric: tabular-nums;
+}
+
+button {
+    font: inherit;
+}
+
+// Buttons shared across the game UI
+.ge-btn {
+    display: inline-flex;
     align-items: center;
+    justify-content: center;
+    gap: 0.45rem;
+    padding: 0.55rem 0.9rem;
+    border-radius: 9px;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    background: rgba(255, 255, 255, 0.07);
+    color: var(--ge-text);
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 120ms ease, transform 80ms ease, box-shadow 120ms ease;
+
+    &:hover:not(:disabled) {
+        background: rgba(255, 255, 255, 0.13);
+    }
+
+    &:active:not(:disabled) {
+        transform: translateY(1px);
+    }
+
+    &:focus-visible {
+        outline: 2px solid var(--ge-gold);
+        outline-offset: 2px;
+    }
+
+    &:disabled {
+        opacity: 0.45;
+        cursor: not-allowed;
+    }
+
+    &--primary {
+        border-color: rgba(140, 180, 255, 0.5);
+        background: linear-gradient(180deg, #4d8dff, #2a5fd6);
+
+        &:hover:not(:disabled) { background: linear-gradient(180deg, #5f9bff, #3169e2); }
+    }
+
+    &--danger {
+        border-color: rgba(255, 150, 150, 0.5);
+        background: linear-gradient(180deg, #ff6b6b, #cc3340);
+
+        &:hover:not(:disabled) { background: linear-gradient(180deg, #ff7d7d, #d93c4a); }
+    }
+
+    &--ghost {
+        background: transparent;
+    }
+
+    &.is-on {
+        border-color: rgba(255, 120, 190, 0.6);
+        background: rgba(196, 40, 120, 0.3);
+    }
+
+    kbd {
+        font-size: 0.68em;
+    }
+}
+
+kbd {
+    font-family: var(--font-geist-mono), ui-monospace, monospace;
+    font-size: 0.75em;
+    padding: 0.05rem 0.35rem;
+    border-radius: 4px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: rgba(0, 0, 0, 0.25);
+    color: var(--ge-text-muted);
+}
+
+.home-screen-wrapper {
+    width: 100%;
 }

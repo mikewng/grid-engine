@@ -1,28 +1,31 @@
-import { CombatResult } from "@/app/engine/managers/interfaces/manager-interfaces";
+import { CombatOutcome } from "@/engine/rules/combatresolver";
 
 export interface CombatResultsUIProps {
-    combatResult: CombatResult;
+    attackerName: string;
+    defenderName: string;
+    outcome: CombatOutcome;
 }
 
-const CombatResultsUI = ({ combatResult }: CombatResultsUIProps) => {
+/** The strikes of the last fight, in order. */
+const CombatResultsUI = ({ attackerName, defenderName, outcome }: CombatResultsUIProps) => {
+    const name = (by: "attacker" | "defender") => (by === "attacker" ? attackerName : defenderName);
+    const other = (by: "attacker" | "defender") => (by === "attacker" ? defenderName : attackerName);
+
     return (
-        <div
-            style={{
-                backgroundColor: '#f5f5f5',
-                border: '1px solid #ddd',
-                padding: '15px',
-                margin: '10px 0',
-                borderRadius: '4px'
-            }}
-            className="combatresultsui-cpnt-wrapper"
-        >
-            <h3>Combat Result</h3>
-            <p>Attacker Damage Dealt: {combatResult.attackerDamageDealt}</p>
-            <p>Defender Damage Dealt: {combatResult.defenderDamageDealt}</p>
-            <p>Attacker Hits: {combatResult.attackerHits}</p>
-            <p>Defender Hits: {combatResult.defenderHits}</p>
-            <p>Defender Killed: {combatResult.defenderKilled ? 'Yes' : 'No'}</p>
-            <p>Attacker Killed: {combatResult.attackerKilled ? 'Yes' : 'No'}</p>
+        <div className="combatresultsui-cpnt-wrapper">
+            <div className="ge-header">Last fight: {attackerName} vs {defenderName}</div>
+            <ol>
+                {outcome.strikes.map((strike, i) => (
+                    <li key={i}>
+                        {strike.hit
+                            ? `${name(strike.by)} ${strike.crit ? "crits" : "hits"} for ${strike.damage}`
+                            : `${name(strike.by)} misses`}
+                        {strike.weaponBroke && ` (${name(strike.by)}'s weapon breaks)`}
+                        {strike.hit && (strike.by === "attacker" ? strike.defenderHp : strike.attackerHp) === 0 && ` — ${other(strike.by)} is defeated`}
+                    </li>
+                ))}
+            </ol>
+            <p>{attackerName}: {outcome.attackerHp} HP · {defenderName}: {outcome.defenderHp} HP</p>
         </div>
     )
 }

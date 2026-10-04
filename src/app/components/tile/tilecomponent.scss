@@ -1,114 +1,114 @@
-.ge-tile-wrapper {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background-color: #4a7c59;
+// Terrain art, drawn as small inline SVGs scaled to each tile
+$grass-tufts-a: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cg stroke='%23356b2a' stroke-width='1.3' stroke-linecap='round' fill='none' opacity='.55'%3E%3Cpath d='M6 23l1.6-3.2 1.6 3.2'/%3E%3Cpath d='M20 10l1.6-3.2 1.6 3.2'/%3E%3Cpath d='M24 27l1.2-2.4 1.2 2.4'/%3E%3C/g%3E%3C/svg%3E");
+$grass-tufts-b: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cg stroke='%23356b2a' stroke-width='1.3' stroke-linecap='round' fill='none' opacity='.5'%3E%3Cpath d='M10 9l1.4-2.8 1.4 2.8'/%3E%3Cpath d='M23 19l1.6-3.2 1.6 3.2'/%3E%3Cpath d='M5 28l1.2-2.4 1.2 2.4'/%3E%3C/g%3E%3Ccircle cx='16' cy='25' r='.9' fill='%23f3e27a' opacity='.7'/%3E%3C/svg%3E");
+$forest: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cg fill='%235b3b1e'%3E%3Crect x='8' y='14' width='2.2' height='4'/%3E%3Crect x='21.4' y='20' width='2.4' height='4.5'/%3E%3Crect x='11' y='27' width='2.2' height='4'/%3E%3C/g%3E%3Cpath d='M9 2.5l6.5 12H2.5z' fill='%23215a22'/%3E%3Cpath d='M9 2.5l6.5 12H9z' fill='%23174a1a'/%3E%3Cpath d='M22.6 7l7.4 13.5H15.2z' fill='%23276a27'/%3E%3Cpath d='M22.6 7l7.4 13.5h-7.4z' fill='%231b521d'/%3E%3Cpath d='M12 15.5l6.5 12h-13z' fill='%232d7a2b'/%3E%3Cpath d='M12 15.5l6.5 12H12z' fill='%23205e21'/%3E%3C/svg%3E");
+$mountain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M1 29L12 7l6.5 11L22.5 12 31 29z' fill='%237a6a4f'/%3E%3Cpath d='M12 7l6.5 11-3 11H12z' fill='%23000' opacity='.16'/%3E%3Cpath d='M22.5 12L31 29h-5z' fill='%23000' opacity='.14'/%3E%3Cpath d='M12 7l3.2 6.1-1.9-1-1.6 1.6-1.4-1.3-1.5.9z' fill='%23f4f1e8'/%3E%3Cpath d='M22.5 12l2.4 4.6-1.8-.8-1.5.8-1.2-.6z' fill='%23f4f1e8'/%3E%3C/svg%3E");
+$water: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cg fill='none' stroke='%23b5dcff' stroke-width='1.3' stroke-linecap='round' opacity='.65'%3E%3Cpath d='M3 9q3-2.6 6 0t6 0'/%3E%3Cpath d='M15 20q3-2.6 6 0t6 0'/%3E%3Cpath d='M4 27q2.5-2 5 0'/%3E%3C/g%3E%3C/svg%3E");
+$wall: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cg fill='%2362605a' stroke='%232f2d2a' stroke-width='1'%3E%3Crect x='1' y='1' width='14' height='9' rx='1.2'/%3E%3Crect x='17' y='1' width='14' height='9' rx='1.2'/%3E%3Crect x='-7' y='12' width='14' height='9' rx='1.2'/%3E%3Crect x='9' y='12' width='14' height='9' rx='1.2'/%3E%3Crect x='25' y='12' width='14' height='9' rx='1.2'/%3E%3Crect x='1' y='23' width='14' height='8' rx='1.2'/%3E%3Crect x='17' y='23' width='14' height='8' rx='1.2'/%3E%3C/g%3E%3Cg fill='%23fff' opacity='.08'%3E%3Crect x='2' y='2' width='12' height='2'/%3E%3Crect x='18' y='2' width='12' height='2'/%3E%3Crect x='10' y='13' width='12' height='2'/%3E%3C/g%3E%3C/svg%3E");
+
+.ge-tile {
     position: relative;
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    box-shadow: inset 0 0 0 0.5px rgba(0, 0, 0, 0.16);
 
-    &.ge-tile-grass {
-        background-color: #4a7c59;
-    }
-
-    &.ge-tile-water {
-        background-color: #4a7cb8;
-    }
-
-    &.ge-tile-mountain {
-        background-color: #8b7355;
-    }
-
-    &.ge-tile-forest {
-        background-color: rgb(12, 119, 26);
-
-    }
-
-    &.ge-tile-block {
-        background-color: rgb(51, 51, 51);
-
-    }
-
-    &.ge-tile-selected {
-        box-shadow: inset 0 0 10px #0f0;
-    }
-
-    &.ge-tile-highlighted {
-        background-color: rgba(145, 255, 0, 0.24);
-    }
-
-    &.ge-tile-movement-range {
-        background-color: rgba(0, 150, 255, 0.4);
-        box-shadow: inset 0 0 10px rgba(0, 150, 255, 0.3);
-    }
-
-    &.ge-tile-attack-range {
-        background-color: rgba(255, 0, 0, 0.4);
-        box-shadow: inset 0 0 10px rgba(255, 0, 0, 0.3);
-
-        &::after {
-            content: "";
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 8px;
-            height: 8px;
-            background-color: rgba(255, 0, 0, 0.8);
-            border-radius: 50%;
-            z-index: 1;
-        }
-    }
-
-    &.ge-tile-clickable {
+    &.is-clickable {
         cursor: pointer;
-
-        &:hover {
-            filter: brightness(1.1);
-        }
     }
 
-    .ge-tile-content {
-        width: 100%;
-        height: 100%;
-        position: relative;
-        display: flex;
-        justify-content: center;
-        align-items: center;
+    &:focus-visible {
+        outline: 2px solid var(--ge-gold);
+        outline-offset: -2px;
+        z-index: 1;
     }
 
-    .ge-tile-unit-indicator {
-        width: 70%;
-        height: 70%;
-        background-color: #ff6b6b;
-        border: 2px solid #fff;
-        border-radius: 50%;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-        position: relative;
-        z-index: 2;
+    // Terrain
+    &--grass {
+        background-color: #63a34b;
+        background-image: $grass-tufts-a;
 
-        &::after {
-            content: "U";
-            color: white;
-            font-weight: bold;
-            font-size: 14px;
-        }
+        &.ge-tile--v1 { background-color: #5e9d47; background-image: $grass-tufts-b; }
+        &.ge-tile--v2 { background-color: #67a84f; }
+        &.ge-tile--v3 { background-color: #5c9a46; background-image: $grass-tufts-b; }
     }
 
-    .ge-tile-debug-info {
+    &--forest {
+        background-color: #4f8f3f;
+        background-image: $forest;
+    }
+
+    &--mountain {
+        background-color: #9a8763;
+        background-image: $mountain;
+    }
+
+    &--water {
+        background-color: #3d7fcb;
+        background-image: $water;
+        background-repeat: repeat;
+        animation: ge-water 4s ease-in-out infinite alternate;
+
+        &.ge-tile--v1, &.ge-tile--v3 { animation-delay: -2s; }
+    }
+
+    &--block {
+        background-color: #3a3833;
+        background-image: $wall;
+    }
+
+    // Overlays: ::before for the danger zone, ::after for the selected unit's ranges
+    &::before,
+    &::after {
+        content: "";
         position: absolute;
-        top: 2px;
-        left: 2px;
-        font-size: 8px;
-        color: #fff;
-        background: rgba(0, 0, 0, 0.6);
-        padding: 1px 2px;
-        border-radius: 2px;
-        z-index: 3;
+        inset: 0;
+        pointer-events: none;
+        opacity: 0;
+        transition: opacity 120ms ease;
+    }
 
-        .ge-tile-coords {
-            display: block;
-        }
+    &.is-danger::before {
+        opacity: 1;
+        background: repeating-linear-gradient(135deg, rgba(196, 40, 120, 0.42) 0 3px, rgba(196, 40, 120, 0.12) 3px 7px);
+        box-shadow: inset 0 0 0 1px rgba(255, 120, 190, 0.25);
+    }
+
+    // Hard light keeps the terrain's texture but gives it a clean, saturated tint
+    &.is-move::after {
+        opacity: 0.8;
+        background: rgb(40, 110, 255);
+        mix-blend-mode: hard-light;
+        box-shadow: inset 0 0 0 1px rgba(200, 225, 255, 0.9);
+    }
+
+    &.is-attack::after {
+        opacity: 0.75;
+        background: rgb(255, 40, 40);
+        mix-blend-mode: hard-light;
+        box-shadow: inset 0 0 0 1px rgba(255, 200, 200, 0.9);
+    }
+
+    &.is-target::after {
+        opacity: 0.85;
+        background: rgb(255, 40, 40);
+        mix-blend-mode: hard-light;
+        animation: ge-target 0.9s ease-in-out infinite alternate;
+    }
+}
+
+@keyframes ge-water {
+    from { background-position: 0 0; }
+    to { background-position: 5px 0; }
+}
+
+@keyframes ge-target {
+    from { box-shadow: inset 0 0 0 2px rgba(255, 90, 90, 0.9); }
+    to { box-shadow: inset 0 0 0 4px rgba(255, 220, 120, 0.95); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .ge-tile--water,
+    .ge-tile.is-target::after {
+        animation: none;
     }
 }

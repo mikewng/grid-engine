@@ -1,84 +1,71 @@
-import React, { memo, useMemo } from "react";
-import { Tile } from "../../engine/models/grid/tile";
-import { TileType } from "../../engine/models/grid/itile";
+import React, { memo } from "react";
+import { TileType } from "@/engine/models/grid/itile";
 
 import "./tilecomponent.scss"
 
 interface TileProps {
-    tile: Tile;
-    onClick?: (tile: Tile) => void;
-    isSelected?: boolean;
-    isHighlighted?: boolean;
+    x: number;
+    y: number;
+    type: TileType;
+    /** Picks one of a few looks for the same terrain, so the map doesn't tile visibly. */
+    variant?: number;
+    onClick?: (x: number, y: number) => void;
+    onHover?: (x: number, y: number) => void;
     isInMovementRange?: boolean;
     isInAttackRange?: boolean;
+    isInDangerZone?: boolean;
+    isTarget?: boolean;
+    /** Who stands here, for screen readers ("Test Knight, 25 of 25 HP"). */
+    occupant?: string;
 }
 
 const TileComponent: React.FC<TileProps> = memo(({
-    tile,
+    x,
+    y,
+    type,
+    variant = 0,
     onClick,
-    isSelected = false,
-    isHighlighted = false,
+    onHover,
     isInMovementRange = false,
-    isInAttackRange = false
+    isInAttackRange = false,
+    isInDangerZone = false,
+    isTarget = false,
+    occupant,
 }) => {
-    const handleClick = useMemo(() => {
-        return onClick ? () => onClick(tile) : undefined;
-    }, [onClick, tile]);
+    const tileClasses = [
+        "ge-tile",
+        `ge-tile--${TileType[type].toLowerCase()}`,
+        `ge-tile--v${variant}`,
+        isInMovementRange && "is-move",
+        isInAttackRange && "is-attack",
+        isInDangerZone && "is-danger",
+        isTarget && "is-target",
+        onClick && "is-clickable",
+    ].filter(Boolean).join(" ");
 
-    const tileClasses = useMemo(() => {
-        const baseClass = "ge-tile-wrapper";
-        const typeClass = `ge-tile-${TileType[tile.type].toLowerCase()}`;
-        const stateClasses = [
-            isSelected && "ge-tile-selected",
-            isHighlighted && "ge-tile-highlighted",
-            isInMovementRange && "ge-tile-movement-range",
-            isInAttackRange && "ge-tile-attack-range",
-            tile.occupiedByUnitId && "ge-tile-occupied",
-            onClick && "ge-tile-clickable"
-        ].filter(Boolean).join(" ");
-
-        return `${baseClass} ${typeClass} ${stateClasses}`.trim();
-    }, [tile.type, tile.occupiedByUnitId, isSelected, isHighlighted, isInMovementRange, isInAttackRange, onClick]);
-
-    const tileStyle = useMemo(() => ({
-        position: 'relative' as const,
-        aspectRatio: '1',
-        minHeight: '40px',
-        cursor: onClick ? 'pointer' : 'default',
-        transition: 'all 0.15s ease-in-out',
-    }), [onClick]);
+    const label = `${TileType[type]} at ${x}, ${y}` + (occupant ? `, ${occupant}` : "");
 
     return (
-        <div 
+        <div
             className={tileClasses}
-            style={tileStyle}
-            onClick={handleClick}
-            data-x={tile.x}
-            data-y={tile.y}
-            data-tile-type={TileType[tile.type]}
+            onClick={onClick && (() => onClick(x, y))}
+            onMouseEnter={onHover && (() => onHover(x, y))}
+            // Clicking shouldn't move keyboard focus onto the map, so Enter and Space keep working as shortcuts
+            onMouseDown={(e) => e.preventDefault()}
+            onFocus={onHover && (() => onHover(x, y))}
+            data-x={x}
+            data-y={y}
+            data-tile-type={TileType[type]}
             role={onClick ? "button" : undefined}
             tabIndex={onClick ? 0 : undefined}
-            onKeyDown={handleClick && ((e) => {
+            aria-label={label}
+            onKeyDown={onClick && ((e) => {
                 if (e.key === 'Enter' || e.key === ' ') {
                     e.preventDefault();
-                    handleClick();
+                    onClick(x, y);
                 }
             })}
-        >
-            <div className="ge-tile-content">
-                {/* Tile type indicator */}
-                <div className="ge-tile-type" />
-                {/* Unit indicator if occupied */}
-                {tile.occupiedByUnitId && (
-                    <div className="ge-tile-unit-indicator" />
-                )}
-                {/* {process.env.NODE_ENV === 'development' && (
-                    <div className="ge-tile-debug-info">
-                        <span className="ge-tile-coords">{tile.x},{tile.y}</span>
-                    </div>
-                )} */}
-            </div>
-        </div>
+        />
     );
 });
 

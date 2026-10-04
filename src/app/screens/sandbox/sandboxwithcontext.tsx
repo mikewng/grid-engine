@@ -1,19 +1,16 @@
 'use client'
 
-import { GameProvider } from '@/app/context/gamecontext';
-import { testEnemy, testKnightUnit, testMageUnit } from '../../data/units/testunit';
-import { testGridArr } from '../../data/grid/testgrid';
+import { GameConfig, GameProvider } from '@/app/context/gamecontext';
+import { testScenario } from '../../data/game/testscenario';
 import SandboxGame from './sandboxgame';
 
-const SandboxWithContext = () => {
-    const gameConfig = {
-        gridArray: testGridArr,
-        units: [testKnightUnit, testMageUnit, testEnemy],
-        gameMode: 'sandbox' as const,
-        playerFaction: 'player',
-        difficulty: 'normal' as const,
-    };
+const gameConfig: GameConfig = {
+    scenario: testScenario,
+    gameMode: 'sandbox',
+    difficulty: 'normal',
+};
 
+const SandboxWithContext = () => {
     return (
         <GameProvider initialConfig={gameConfig}>
             <SandboxGame />

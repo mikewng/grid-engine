@@ -1,6 +1,7 @@
-import React, { memo, useMemo, useCallback } from "react";
-import { Grid } from "@/app/engine/models/grid/grid";
-import { Tile } from "@/app/engine/models/grid/tile";
+import React, { CSSProperties, ReactNode, useCallback, useLayoutEffect, useRef } from "react";
+import { Grid } from "@/engine/models/grid/grid";
+import { Tile } from "@/engine/models/grid/tile";
+import { coordinateKey } from "@/engine/models/grid/coordinate";
 import TileComponent from "@/app/components/tile/tilecomponent";
 
 import "./gridcomponent.scss"
@@ -8,77 +9,98 @@ import "./gridcomponent.scss"
 interface GridProps {
     grid: Grid;
     onTileClick?: (tile: Tile) => void;
-    selectedTile?: Tile | null;
-    highlightedTiles?: Set<string>;
+    onTileHover?: (tile: Tile | null) => void;
+    /** Right click: the "back" button. */
+    onCancel?: () => void;
+    // Sets of coordinateKey() strings
     movementRangeTiles?: Set<string>;
     attackRangeTiles?: Set<string>;
+    dangerTiles?: Set<string>;
+    targetTiles?: Set<string>;
+    /** Who stands on each tile, by coordinateKey, for screen readers. */
+    occupants?: Map<string, string>;
+    /** Drawn over the tiles (units, cursor, effects). Position children in tile units with --cols and --rows. */
+    children?: ReactNode;
 }
 
-const GridComponent: React.FC<GridProps> = memo(({
+const EMPTY = new Set<string>();
+const NO_OCCUPANTS = new Map<string, string>();
+
+/** A fixed-looking but varied pick of terrain art per tile. */
+const variantOf = (x: number, y: number) => (((x * 73856093) ^ (y * 19349663)) >>> 0) & 3;
+
+const GridComponent: React.FC<GridProps> = ({
     grid,
     onTileClick,
-    selectedTile,
-    highlightedTiles = new Set(),
-    movementRangeTiles = new Set(),
-    attackRangeTiles = new Set()
+    onTileHover,
+    onCancel,
+    movementRangeTiles = EMPTY,
+    attackRangeTiles = EMPTY,
+    dangerTiles = EMPTY,
+    targetTiles = EMPTY,
+    occupants = NO_OCCUPANTS,
+    children,
 }) => {
-    
-    // Flatten grid for efficient rendering
-    const flattenedTiles = useMemo(() => {
-        const tiles: Tile[] = [];
-        for (let y = 0; y < grid.height; y++) {
-            for (let x = 0; x < grid.width; x++) {
-                tiles.push(grid.gridcontent[y][x]);
-            }
-        }
-        return tiles;
-    }, [grid.gridcontent, grid.height, grid.width]);
+    // Keep the latest handlers in refs, so tiles get stable callbacks and only
+    // re-render when their own props change
+    const clickRef = useRef(onTileClick);
+    const hoverRef = useRef(onTileHover);
 
-    const handleTileClick = useCallback((tile: Tile) => {
-        onTileClick?.(tile);
-    }, [onTileClick]);
+    useLayoutEffect(() => {
+        clickRef.current = onTileClick;
+        hoverRef.current = onTileHover;
+    });
 
-    // CSS Grid template for optimal layout
-    const gridStyle = useMemo(() => ({
-        display: 'grid',
-        gridTemplateColumns: `repeat(${grid.width}, 1fr)`,
-        gridTemplateRows: `repeat(${grid.height}, 1fr)`,
-        gap: '0px',
-        aspectRatio: `${grid.width} / ${grid.height}`,
-        width: '100%',
-        margin: '0 auto'
-    }), [grid.width, grid.height]);
+    const handleClick = useCallback((x: number, y: number) => {
+        clickRef.current?.(grid.gridcontent[y][x]);
+    }, [grid]);
+
+    const handleHover = useCallback((x: number, y: number) => {
+        hoverRef.current?.(grid.gridcontent[y][x]);
+    }, [grid]);
+
+    const boardStyle = {
+        "--cols": grid.width,
+        "--rows": grid.height,
+    } as CSSProperties;
 
     return (
-        <div className="ge-grid-component-wrapper">
-            <div 
-                className="ge-grid-layout"
-                style={gridStyle}
-            >
-                {flattenedTiles.map((tile) => {
-                    const tileKey = `${tile.x}-${tile.y}`;
-                    const isSelected = selectedTile?.x === tile.x && selectedTile?.y === tile.y;
-                    const isHighlighted = highlightedTiles.has(tileKey);
-                    const isInMovementRange = movementRangeTiles.has(tileKey);
-                    const isInAttackRange = attackRangeTiles.has(tileKey);
+        <div
+            className="ge-board"
+            style={boardStyle}
+            onMouseLeave={() => hoverRef.current?.(null)}
+            onContextMenu={onCancel && ((e) => {
+                e.preventDefault();
+                onCancel();
+            })}
+        >
+            <div className="ge-board-tiles" role="grid" aria-label={`${grid.width} by ${grid.height} map`}>
+                {grid.gridcontent.flat().map((tile) => {
+                    const key = coordinateKey(tile);
 
                     return (
                         <TileComponent
-                            key={tileKey}
-                            tile={tile}
-                            onClick={handleTileClick}
-                            isSelected={isSelected}
-                            isHighlighted={isHighlighted}
-                            isInMovementRange={isInMovementRange}
-                            isInAttackRange={isInAttackRange}
+                            key={key}
+                            x={tile.x}
+                            y={tile.y}
+                            type={tile.type}
+                            variant={variantOf(tile.x, tile.y)}
+                            onClick={onTileClick && handleClick}
+                            onHover={onTileHover && handleHover}
+                            isInMovementRange={movementRangeTiles.has(key)}
+                            isInAttackRange={attackRangeTiles.has(key)}
+                            isInDangerZone={dangerTiles.has(key)}
+                            isTarget={targetTiles.has(key)}
+                            occupant={occupants.get(key)}
                         />
                     );
                 })}
             </div>
+            <div className="ge-board-layer">
+                {children}
+            </div>
         </div>
     );
-});
-
-GridComponent.displayName = 'GridComponent';
+};
 
 export default GridComponent;

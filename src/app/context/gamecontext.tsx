@@ -1,57 +1,49 @@
 'use client'
 
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { GameSetup, GameManagers } from '../data/game/gamesetup';
-import { IUnit } from '../engine/models/units/iunit';
-import { Tile } from '../engine/models/grid/tile';
+import React, { createContext, useCallback, useContext, useState, useSyncExternalStore, ReactNode } from 'react';
+import { createGame, GameManagers, Scenario } from '@/engine/gamesetup';
+import { Coordinate } from '@/engine/models/grid/coordinate';
 
 export interface GameConfig {
-    gridArray: string[][];
-    units: IUnit[];
+    scenario: Scenario;
     gameMode?: 'sandbox' | 'campaign' | 'skirmish';
-    playerFaction?: string;
     difficulty?: 'easy' | 'normal' | 'hard';
 }
 
+/**
+ * UI-only state: what the player is pointing at and which step of a unit's
+ * action they're on. Game state (turns, positions, HP) lives in the engine.
+ *   select: pick a unit
+ *   move:   pick where it goes
+ *   action: choose Attack, Wait or Cancel
+ *   target: pick who to attack, then confirm
+ */
+export type UiPhase = 'select' | 'move' | 'action' | 'target';
+
 export interface GameState {
-    selectedTile: Tile | null;
+    selectedTile: Coordinate | null;
+    hoveredTile: Coordinate | null;
     selectedUnit: string | null;
-    targetUnit: string | null;
-    gamePhase: 'select' | 'move' | 'attack' | 'enemy_turn' | 'game_over';
-    currentTurn: number;
-    movementRange: Set<string>;
-    attackRange: Set<string>;
-    combatResult: any | null;
+    gamePhase: UiPhase;
 }
 
 export interface GameContextType {
-    // Configuration
     config: GameConfig | null;
-
-    // Managers
     managers: GameManagers | null;
-
-    // Game State
+    /** Changes whenever the engine changes, so components re-render. */
+    version: number;
     gameState: GameState;
-
-    // Actions
     initializeGame: (config: GameConfig) => void;
     resetGame: () => void;
     updateGameState: (updates: Partial<GameState>) => void;
-
-    // Convenience getters
     isGameInitialized: boolean;
 }
 
 const defaultGameState: GameState = {
     selectedTile: null,
+    hoveredTile: null,
     selectedUnit: null,
-    targetUnit: null,
     gamePhase: 'select',
-    currentTurn: 1,
-    movementRange: new Set(),
-    attackRange: new Set(),
-    combatResult: null,
 };
 
 const GameContext = createContext<GameContextType | undefined>(undefined);
@@ -61,46 +53,36 @@ export interface GameProviderProps {
     initialConfig?: GameConfig;
 }
 
-export const GameProvider: React.FC<GameProviderProps> = ({ children, initialConfig }) => {
+const noSubscription = () => () => { };
 
-    const [config, setConfig] = useState<GameConfig | null>(initialConfig || null);
-    const [managers, setManagers] = useState<GameManagers | null>(null);
+export const GameProvider: React.FC<GameProviderProps> = ({ children, initialConfig }) => {
+    const [config, setConfig] = useState<GameConfig | null>(initialConfig ?? null);
+    const [managers, setManagers] = useState<GameManagers | null>(() => initialConfig ? createGame(initialConfig.scenario) : null);
     const [gameState, setGameState] = useState<GameState>(defaultGameState);
 
+    const subscribe = managers?.gameManager.subscribe ?? noSubscription;
+    const getVersion = useCallback(() => managers?.gameManager.getVersion() ?? 0, [managers]);
+    const version = useSyncExternalStore(subscribe, getVersion, getVersion);
 
-    const initializeGame = (newConfig: GameConfig) => {
-        console.log('initializeGame called with config:', newConfig);
-        try {
-            const gameManagers = GameSetup.initializeManagers(newConfig.gridArray, newConfig.units);
-            setConfig(newConfig);
-            setManagers(gameManagers);
-            setGameState(defaultGameState);
-        } catch (error) {
-            console.error('Failed to initialize game:', error);
-            throw error;
-        }
-    };
+    // Each call builds fresh units from the scenario, so a reset really starts over
+    const initializeGame = useCallback((newConfig: GameConfig) => {
+        setConfig(newConfig);
+        setManagers(createGame(newConfig.scenario));
+        setGameState(defaultGameState);
+    }, []);
 
-    const resetGame = () => {
-        if (config) {
-            initializeGame(config);
-        }
-    };
+    const resetGame = useCallback(() => {
+        if (config) initializeGame(config);
+    }, [config, initializeGame]);
 
-    const updateGameState = (updates: Partial<GameState>) => {
+    const updateGameState = useCallback((updates: Partial<GameState>) => {
         setGameState(prev => ({ ...prev, ...updates }));
-    };
-
-    // Initialize with initial config if provided
-    useEffect(() => {
-        if (initialConfig && !managers) {
-            initializeGame(initialConfig);
-        }
-    }, [initialConfig, managers]);
+    }, []);
 
     const contextValue: GameContextType = {
         config,
         managers,
+        version,
         gameState,
         initializeGame,
         resetGame,

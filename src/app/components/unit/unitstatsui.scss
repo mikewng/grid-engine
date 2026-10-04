@@ -1,24 +1,246 @@
-.unitstatsui-cpnt-wrapper {
-    .unitstatsui-header-container {
-        display: flex;
-        justify-content: space-between;
-        gap: 1rem;
-    }
+.ge-unit-card {
+    --accent: var(--ge-player);
+    --accent-dark: var(--ge-player-dark);
 
-    .unitstatsui-body-container {
-        display: flex;
-        justify-content: space-between;
-        gap: 1rem;
-    }
-}
+    &.faction-enemy { --accent: var(--ge-enemy); --accent-dark: var(--ge-enemy-dark); }
+    &.faction-p2 { --accent: var(--ge-ally); --accent-dark: var(--ge-ally-dark); }
+    &.faction-neutral { --accent: var(--ge-neutral); --accent-dark: var(--ge-neutral-dark); }
 
-.unitbasicstatsui-cpnt-wrapper {
+    border-radius: var(--ge-radius);
+    background: linear-gradient(180deg, var(--ge-window-top) 0%, var(--ge-window-bottom) 100%);
+    border: 1px solid var(--ge-panel-border);
+    border-top: 3px solid var(--accent);
+    padding: 0.85rem;
     display: flex;
-    gap: 1rem;
+    flex-direction: column;
+    gap: 0.7rem;
 
-    .basic-stat-container {
+    .ge-unit-card-header {
+        display: flex;
+        align-items: center;
+        gap: 0.7rem;
+    }
+
+    .ge-unit-card-badge {
+        flex: none;
+        width: 2.6rem;
+        height: 2.6rem;
+        border-radius: 50%;
+        display: grid;
+        place-items: center;
+        color: #fff;
+        background: radial-gradient(circle at 35% 30%, rgba(255, 255, 255, 0.5) 0%, var(--accent) 45%, var(--accent-dark) 100%);
+        border: 2px solid rgba(255, 255, 255, 0.9);
+
+        svg {
+            width: 58%;
+            height: 58%;
+        }
+    }
+
+    .ge-unit-card-title {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .ge-unit-card-name {
+        font-size: 1.1rem;
+        font-weight: 700;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .ge-unit-card-sub {
+        font-size: 0.8rem;
+        color: var(--ge-text-muted);
+    }
+
+    .ge-unit-card-faction {
+        color: var(--accent);
+        font-weight: 600;
+    }
+
+    .ge-unit-card-status {
+        font-size: 0.7rem;
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        padding: 0.2rem 0.5rem;
+        border-radius: 99px;
+        background: rgba(255, 255, 255, 0.08);
+        color: var(--ge-text-muted);
+    }
+
+    .ge-unit-card-hp {
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+    }
+
+    .ge-unit-card-hp-label {
+        font-size: 0.75rem;
+        font-weight: 700;
+        color: var(--ge-gold);
+    }
+
+    .ge-unit-card-hp-bar {
+        flex: 1;
+        height: 0.6rem;
+        border-radius: 99px;
+        background: rgba(0, 0, 0, 0.45);
+        overflow: hidden;
+
+        span {
+            display: block;
+            height: 100%;
+            border-radius: 99px;
+            transition: width 300ms ease;
+
+            &.hp-high { background: linear-gradient(90deg, #35b85a, #7cf29b); }
+            &.hp-mid { background: linear-gradient(90deg, #d9a520, #ffe27a); }
+            &.hp-low { background: linear-gradient(90deg, #d63434, #ff8f8f); }
+        }
+    }
+
+    .ge-unit-card-hp-value {
+        font-size: 1.15rem;
+        font-weight: 700;
+
+        small {
+            font-size: 0.75rem;
+            color: var(--ge-text-muted);
+            font-weight: 500;
+        }
+    }
+
+    .ge-unit-card-combat {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 0.35rem;
+    }
+
+    .ge-stat-chip {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 0.3rem 0;
+        border-radius: 8px;
+        background: rgba(0, 0, 0, 0.25);
+
+        span {
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: var(--ge-text-muted);
+        }
+
+        strong {
+            font-size: 1rem;
+        }
+    }
+
+    .ge-unit-card-stats {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 0.15rem 0.9rem;
+    }
+
+    .ge-stat {
         display: flex;
         justify-content: space-between;
-        gap: 0.5rem;
+        font-size: 0.85rem;
+        padding: 0.15rem 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+
+        span {
+            color: var(--ge-gold);
+            font-weight: 600;
+            font-size: 0.72rem;
+            letter-spacing: 0.05em;
+        }
+    }
+
+    .ge-unit-card-items {
+        display: flex;
+        flex-direction: column;
+        gap: 0.35rem;
+    }
+
+    .ge-unit-card-empty {
+        font-size: 0.85rem;
+        color: var(--ge-text-muted);
+    }
+
+    .ge-item {
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+        padding: 0.4rem 0.55rem;
+        border-radius: 8px;
+        background: rgba(0, 0, 0, 0.22);
+
+        &.is-equipped {
+            box-shadow: inset 0 0 0 1px var(--ge-gold-soft);
+        }
+    }
+
+    .ge-item-icon {
+        flex: none;
+        width: 1.2rem;
+        height: 1.2rem;
+        color: var(--ge-gold);
+    }
+
+    .ge-item-main {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .ge-item-name {
+        font-size: 0.9rem;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+    }
+
+    .ge-item-equipped {
+        font-size: 0.6rem;
+        font-weight: 800;
+        padding: 0.05rem 0.3rem;
+        border-radius: 4px;
+        color: #1a1405;
+        background: var(--ge-gold);
+    }
+
+    .ge-item-detail {
+        font-size: 0.72rem;
+        color: var(--ge-text-muted);
+    }
+
+    .ge-item-uses {
+        font-size: 0.9rem;
+        font-weight: 700;
+
+        small {
+            font-size: 0.7rem;
+            color: var(--ge-text-muted);
+            font-weight: 500;
+        }
+    }
+
+    .ge-unit-card-effects {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.35rem;
+    }
+
+    .ge-effect-chip {
+        font-size: 0.75rem;
+        padding: 0.15rem 0.5rem;
+        border-radius: 99px;
+        background: rgba(170, 90, 255, 0.25);
+        color: #dcbcff;
     }
 }

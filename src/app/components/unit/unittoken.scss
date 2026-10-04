@@ -1,0 +1,153 @@
+// Lives inside .ge-board-layer, which sets --cols, --rows and --tile
+.ge-token {
+    position: absolute;
+    width: calc(100% / var(--cols));
+    height: calc(100% / var(--rows));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    // Gliding from tile to tile as a path plays out
+    transition: left 110ms linear, top 110ms linear, filter 200ms ease, opacity 200ms ease;
+    z-index: 2;
+
+    --token-light: #9ec2ff;
+    --token-main: var(--ge-player);
+    --token-dark: var(--ge-player-dark);
+
+    &.faction-enemy { --token-light: #ffb0a8; --token-main: var(--ge-enemy); --token-dark: var(--ge-enemy-dark); }
+    &.faction-p2 { --token-light: #a8f0c4; --token-main: var(--ge-ally); --token-dark: var(--ge-ally-dark); }
+    &.faction-neutral { --token-light: #ffe0a0; --token-main: var(--ge-neutral); --token-dark: var(--ge-neutral-dark); }
+
+    .ge-token-body {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: transform 150ms ease-out;
+    }
+
+    .ge-token-badge {
+        width: 72%;
+        height: 72%;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+        background: radial-gradient(circle at 35% 30%, var(--token-light) 0%, var(--token-main) 45%, var(--token-dark) 100%);
+        border: max(1.5px, calc(var(--tile) * 0.05)) solid rgba(255, 255, 255, 0.92);
+        box-shadow:
+            0 calc(var(--tile) * 0.06) calc(var(--tile) * 0.12) rgba(0, 0, 0, 0.45),
+            inset 0 -2px 4px rgba(0, 0, 0, 0.25);
+    }
+
+    .ge-token-icon {
+        width: 60%;
+        height: 60%;
+        filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.45));
+    }
+
+    .ge-token-hp {
+        position: absolute;
+        left: 16%;
+        right: 16%;
+        bottom: 4%;
+        height: max(3px, calc(var(--tile) * 0.09));
+        border-radius: 99px;
+        background: rgba(0, 0, 0, 0.7);
+        box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.35);
+        overflow: hidden;
+    }
+
+    .ge-token-hp-fill {
+        display: block;
+        height: 100%;
+        border-radius: 99px;
+        transition: width 320ms ease;
+
+        &.hp-high { background: linear-gradient(#7cf29b, #35b85a); }
+        &.hp-mid { background: linear-gradient(#ffe27a, #d9a520); }
+        &.hp-low { background: linear-gradient(#ff8f8f, #d63434); }
+    }
+
+    &.is-ready .ge-token-badge {
+        animation: ge-token-bob 1.4s ease-in-out infinite alternate;
+    }
+
+    &.is-selected {
+        z-index: 3;
+
+        .ge-token-badge {
+            animation: ge-token-bob 0.5s ease-in-out infinite alternate;
+            box-shadow:
+                0 0 0 max(2px, calc(var(--tile) * 0.06)) var(--ge-gold),
+                0 0 calc(var(--tile) * 0.4) var(--ge-gold),
+                0 calc(var(--tile) * 0.06) calc(var(--tile) * 0.12) rgba(0, 0, 0, 0.45);
+        }
+    }
+
+    &.is-acted {
+        filter: grayscale(0.9) brightness(0.8);
+    }
+
+    &.is-lunging {
+        z-index: 4;
+
+        .ge-token-body {
+            transform: translate(calc(var(--lunge-x) * 30%), calc(var(--lunge-y) * 30%)) scale(1.08);
+        }
+    }
+
+    &.is-hurt .ge-token-badge {
+        animation: ge-token-hurt 320ms ease-out;
+    }
+
+    &.is-hurt-crit .ge-token-badge {
+        animation: ge-token-crit 450ms ease-out;
+    }
+
+    &.is-dying {
+        animation: ge-token-die 520ms ease-in forwards;
+    }
+}
+
+@keyframes ge-token-bob {
+    from { transform: translateY(2%); }
+    to { transform: translateY(-6%); }
+}
+
+@keyframes ge-token-hurt {
+    0% { transform: translateX(0); filter: brightness(2.2) saturate(0.4); }
+    25% { transform: translateX(-9%); }
+    50% { transform: translateX(8%); filter: brightness(1.4); }
+    75% { transform: translateX(-5%); }
+    100% { transform: translateX(0); filter: none; }
+}
+
+@keyframes ge-token-crit {
+    0% { transform: scale(1.15); filter: brightness(3) saturate(0); }
+    20% { transform: translateX(-12%) scale(1.05); }
+    40% { transform: translateX(12%); filter: brightness(1.6); }
+    60% { transform: translateX(-8%); }
+    80% { transform: translateX(5%); }
+    100% { transform: none; filter: none; }
+}
+
+@keyframes ge-token-die {
+    0% { opacity: 1; transform: scale(1); filter: brightness(2) grayscale(0); }
+    100% { opacity: 0; transform: scale(0.4) translateY(-20%); filter: brightness(1) grayscale(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .ge-token,
+    .ge-token .ge-token-body {
+        transition: none;
+    }
+
+    .ge-token.is-ready .ge-token-badge,
+    .ge-token.is-selected .ge-token-badge {
+        animation: none;
+    }
+}
