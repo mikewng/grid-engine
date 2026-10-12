@@ -23,7 +23,17 @@ export interface IUnit {
     hasActed: boolean;
     statusEffects: UnitStatusEffect[];
     unitFaction: UnitFaction;
+    /** How the AI plays it, when its faction is AI-controlled. */
+    ai: AiBehavior;
 }
+
+/**
+ * How an AI-controlled unit behaves:
+ *   charge: attacks what it can reach, otherwise marches on the nearest enemy
+ *   ambush: attacks what it can reach this turn, otherwise stays put
+ *   hold:   never moves, and attacks only what it can reach from where it stands
+ */
+export type AiBehavior = "charge" | "ambush" | "hold";
 
 export interface UnitStats {
     currentExperience: number;

@@ -125,12 +125,98 @@ const wall: Pixels = Array.from({ length: SIZE }, (_, y) => {
     }).join("");
 });
 
+// --- Road ---
+
+const ROAD: Palette = { d: "#c4a374", D: "#a3845c", l: "#dcc394" };
+
+const STONE = pixels(`
+    ll
+    DD
+`);
+const PEBBLE = ["lD"];
+
+const road = stampAll(fill("d"), [
+    [STONE, 2, 2], [PEBBLE, 9, 1], [STONE, 11, 7], [PEBBLE, 4, 9], [STONE, 6, 12], [PEBBLE, 13, 13],
+    [["D"], 1, 7], [["l"], 8, 5], [["D"], 14, 3], [["l"], 1, 13],
+]);
+
+// --- Bridge ---
+
+const BRIDGE: Palette = { w: "#b8874d", W: "#94683a", g: "#5e3d1c", r: "#6b4423", R: "#4a2e14" };
+
+/** Planks running across the river, between a rail on each side with posts every eight pixels. */
+const bridge: Pixels = Array.from({ length: SIZE }, (_, y) => {
+    if (y === 0 || y === SIZE - 1) return "R".repeat(SIZE);
+    if (y === 1 || y === SIZE - 2) return Array.from({ length: SIZE }, (_, x) => (x % 8 === 3 ? "R" : "r")).join("");
+    return Array.from({ length: SIZE }, (_, x) => ["w", "w", "W", "g"][x % 4]).join("");
+});
+
+// --- Fort ---
+
+const FORT: Palette = { ...GRASS, o: "#3f3b34", c: "#cfc9b8", n: "#a8a294", N: "#7d786c", x: "#2a2620", p: "#5e3d1c", f: "#c8452d" };
+
+const KEEP = pixels(`
+    ........pff.....
+    ........pfff....
+    .ooo..oooo..ooo.
+    .oco..ocno..oco.
+    .oooooooooooooo.
+    .occcccccccccco.
+    .ocnncnncnncnco.
+    .occcccccccccco.
+    .ocncnncnncnnco.
+    .occccoooocccco.
+    .ocncnoxxoncnco.
+    .occccoxxocccco.
+    .oNNNNoxxoNNNNo.
+    .oooooooooooooo.
+`);
+
+const fort = stampAll(fill("g"), [[KEEP, 0, 0], [LIGHT, 2, 15], [DARK, 12, 14]]);
+
+// --- Sand ---
+
+const SAND: Palette = { s: "#e2c98a", S: "#c9ad6c", l: "#f2e2b0" };
+
+const RIPPLE = ["ll..", ".SSS"];
+
+const sand = stampAll(fill("s"), [
+    [RIPPLE, 1, 2], [RIPPLE, 9, 5], [RIPPLE, 3, 10], [RIPPLE, 11, 12],
+    [["S"], 7, 1], [["l"], 14, 8], [["S"], 1, 14], [["l"], 6, 7],
+]);
+
+// --- Village ---
+
+const VILLAGE: Palette = { ...GRASS, o: "#3a2a1a", r: "#c8452d", R: "#8e2a1f", h: "#f0e2c0", H: "#c9b48a", x: "#5e3d1c", b: "#3d7fcb" };
+
+const HOUSE = pixels(`
+    ......oooo......
+    .....orrrro.....
+    ....orrrrrro....
+    ...orrrrrrrro...
+    ..orrrrrrrrrro..
+    .oRRRRRRRRRRRRo.
+    ..ohhhhhhhhhho..
+    ..ohbbhhhhbbho..
+    ..ohbbhhhhbbho..
+    ..ohhhhxxhhhho..
+    ..oHHHHxxHHHHo..
+    ..oooooooooooo..
+`);
+
+const village = stampAll(fill("g"), [[TUFT, 12, 0], [HOUSE, 0, 2], [LIGHT, 1, 15], [DARK, 14, 15]]);
+
 export const TERRAIN_TILES: Record<TileType, { palette: Palette; variants: Pixels[] }> = {
     [TileType.Grass]: { palette: GRASS, variants: grass },
     [TileType.Forest]: { palette: FOREST, variants: [forest] },
     [TileType.Mountain]: { palette: MOUNTAIN, variants: [mountain] },
     [TileType.Water]: { palette: WATER, variants: [water, shift(water, 2)] },
     [TileType.Block]: { palette: WALL, variants: [wall] },
+    [TileType.Road]: { palette: ROAD, variants: [road] },
+    [TileType.Bridge]: { palette: BRIDGE, variants: [bridge] },
+    [TileType.Fort]: { palette: FORT, variants: [fort] },
+    [TileType.Sand]: { palette: SAND, variants: [sand] },
+    [TileType.Village]: { palette: VILLAGE, variants: [village] },
 };
 
 const tileClass = (type: TileType) => `.ge-tile--${TileType[type].toLowerCase()}`;
@@ -143,7 +229,7 @@ const TERRAIN_CSS = (() => {
     grass.forEach((_, variant) => rules.push(`${tileClass(TileType.Grass)}.ge-tile--v${variant}{background-image:${url(TileType.Grass, variant)}}`));
     rules.push(`${tileClass(TileType.Grass)}{background-image:${url(TileType.Grass, 0)}}`);
 
-    for (const type of [TileType.Forest, TileType.Mountain, TileType.Block]) {
+    for (const type of [TileType.Forest, TileType.Mountain, TileType.Block, TileType.Road, TileType.Bridge, TileType.Fort, TileType.Sand, TileType.Village]) {
         rules.push(`${tileClass(type)}{background-image:${url(type, 0)}}`);
     }
 

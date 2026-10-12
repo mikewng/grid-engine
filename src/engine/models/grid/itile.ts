@@ -14,5 +14,10 @@ export enum TileType {
     Forest,
     Mountain,
     Water,
-    Block
+    Block,
+    Road,
+    Bridge,
+    Fort,
+    Sand,
+    Village,
 }

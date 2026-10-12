@@ -23,6 +23,7 @@ import BattleLog from './components/battlelog';
 import { ActionMenu, GameOver, PhaseBanner, SkipButton, Toast } from './components/mapwindows';
 import { BannerInfo, PlaybackContext, snapshotUnits, usePlayback } from './useplayback';
 import { threatOf } from './threat';
+import { SCENARIOS } from '@/app/data/game/scenarios';
 import './sandbox.scss';
 
 const EMPTY = new Set<string>();
@@ -67,9 +68,11 @@ interface SandboxViewProps {
     gameState: GameState;
     updateGameState: (updates: Partial<GameState>) => void;
     resetGame: () => void;
+    /** Start a new game, such as on another map. */
+    initializeGame: (config: GameConfig) => void;
 }
 
-const SandboxView = ({ config, managers, gameState, updateGameState, resetGame }: SandboxViewProps) => {
+const SandboxView = ({ config, managers, gameState, updateGameState, resetGame, initializeGame }: SandboxViewProps) => {
     const [notice, setNotice] = useState<{ id: number; text: string } | null>(null);
     const [targetId, setTargetId] = useState<string | null>(null);
     const [inspectedId, setInspectedId] = useState<string | null>(null);
@@ -225,12 +228,20 @@ const SandboxView = ({ config, managers, gameState, updateGameState, resetGame }
         run({ type: 'endTurn' });
     };
 
-    const restart = () => {
+    const restart = (next?: GameConfig) => {
         skip();
         setNotice(null);
         setTargetId(null);
         setInspectedId(null);
-        resetGame();
+        if (next) initializeGame(next);
+        else resetGame();
+    };
+
+    const map = SCENARIOS.find(entry => entry.scenario === config.scenario);
+
+    const switchMap = (id: string) => {
+        const entry = SCENARIOS.find(candidate => candidate.id === id);
+        if (entry && entry !== map) restart({ ...config, scenario: entry.scenario });
     };
 
     const handleTileClick = (tile: Tile) => {
@@ -427,7 +438,15 @@ const SandboxView = ({ config, managers, gameState, updateGameState, resetGame }
                     <span className="ge-brand-mark" aria-hidden="true" />
                     <div>
                         <h1>Grid Engine</h1>
-                        <p>Sandbox skirmish · {grid.width}×{grid.height} map{config.scenario.seed !== undefined && ` · seed ${config.scenario.seed}`}</p>
+                        <p>
+                            <label className="ge-map-picker">
+                                <span>Map</span>
+                                <select value={map?.id} onChange={(event) => switchMap(event.target.value)} title={map?.description}>
+                                    {SCENARIOS.map(entry => <option key={entry.id} value={entry.id}>{entry.name}</option>)}
+                                </select>
+                            </label>
+                            {' '}· {grid.width}×{grid.height}{config.scenario.seed !== undefined && ` · seed ${config.scenario.seed}`}
+                        </p>
                     </div>
                 </div>
                 <div className="ge-legend" aria-label="Map legend">
@@ -517,7 +536,7 @@ const SandboxView = ({ config, managers, gameState, updateGameState, resetGame }
                         {playback.banner && <PhaseBanner banner={playback.banner} />}
                         {playing && <SkipButton onSkip={skip} />}
                         {notice && <Toast key={notice.id} text={notice.text} />}
-                        {turn.isOver && !playing && <GameOver victory={victory} turn={turn.turn} onRestart={restart} />}
+                        {turn.isOver && !playing && <GameOver victory={victory} turn={turn.turn} onRestart={() => restart()} />}
                     </GridComponent>
                 </main>
 
@@ -534,7 +553,7 @@ const SandboxView = ({ config, managers, gameState, updateGameState, resetGame }
                         fast={fast}
                         battleScenes={battleScenes}
                         onEndTurn={endTurn}
-                        onReset={restart}
+                        onReset={() => restart()}
                         onToggleDangerZone={() => setDangerZone(on => !on)}
                         onToggleAutoEnd={() => setAutoEnd(on => !on)}
                         onToggleFast={() => setFast(on => !on)}
@@ -575,6 +594,7 @@ const SandboxView = ({ config, managers, gameState, updateGameState, resetGame }
                             <li>Choose <b>Attack</b>, then click an enemy to see the forecast. Click again or press <kbd>Enter</kbd> to strike.</li>
                             <li><b>Cancel</b> (or right-click) takes a move back until the unit acts.</li>
                             <li>Turn on the <b>Danger Zone</b> to see every tile the enemy can reach.</li>
+                            <li>Forts give cover and heal a fifth of max HP at the start of each turn. Some enemies lie in wait until you come within reach, and the castle guard never leaves its post.</li>
                         </ol>
                     </details>
 
@@ -602,7 +622,7 @@ const SandboxView = ({ config, managers, gameState, updateGameState, resetGame }
 };
 
 const SandboxGame = () => {
-    const { config, isGameInitialized, managers, gameState, updateGameState, resetGame } = useGame();
+    const { config, isGameInitialized, managers, gameState, updateGameState, resetGame, initializeGame } = useGame();
 
     if (!isGameInitialized || !config || !managers) {
         return <div className="ge-loading">Loading game…</div>;
@@ -615,6 +635,7 @@ const SandboxGame = () => {
             gameState={gameState}
             updateGameState={updateGameState}
             resetGame={resetGame}
+            initializeGame={initializeGame}
         />
     );
 };

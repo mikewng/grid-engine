@@ -34,7 +34,7 @@ Most methods return a `Result<T>`: check `success`, then read `value` or `err`.
 
 ## Grid and Terrain
 - A grid is any width x height of tiles.
-- Each tile type has a `TerrainDefinition`: movement cost per movement type (infantry, armored, mounted, flying; `null` means impassable), avoid bonus and defense bonus.
+- Each tile type has a `TerrainDefinition`: movement cost per movement type (infantry, armored, mounted, flying; `null` means impassable), avoid bonus and defense bonus, and optionally `heal`: the share of max HP a unit recovers when it starts its turn there (a fort heals 0.2).
 - Which unit stands on a tile is worked out from unit positions (`refreshOccupancy`), so tiles and units can't disagree.
 
 ## Units
@@ -66,6 +66,7 @@ Most methods return a `Result<T>`: check `success`, then read `value` or `err`.
 - Every action goes through `gameManager.execute(command)`: `move`, `moveTo`, `undoMove` (take a move back before acting), `attack`, `wait` or `endTurn`. It checks it's that unit's faction's turn and that the unit can still act. It returns what happened as a list of events, or why the command was refused.
 - `getHistory()` is the log of every event.
 - AI factions play their whole turn as soon as it starts. `continueAi()` advances games where every faction is AI.
+- A unit template's `ai` sets how the AI plays it: `charge` (the default) attacks what it can reach or marches on the nearest enemy, `ambush` waits until it can attack this turn, and `hold` never leaves its tile.
 - The game ends when no two factions left standing are hostile to each other.
 - The same seed and the same commands always play out the same way.
 - `subscribe` and `getVersion` let React (`useSyncExternalStore`) re-render when the game changes.

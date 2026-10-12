@@ -125,6 +125,27 @@ describe("turns", () => {
         expect(gridManager.getTileAtPosition(1, 0).value!.occupiedByUnitId).toBeUndefined();
     });
 
+    it("heals units that start their turn on a fort, up to their max HP", () => {
+        const { gameManager, unitManager } = game(["T.T...."], [
+            unit("a", P1, 0, 0, { stats: { currentHealth: 10 } }),
+            unit("b", P1, 2, 0, { stats: { currentHealth: 19 } }),
+            unit("c", P1, 3, 0, { stats: { currentHealth: 10 } }),
+            unit("e", ENEMY, 6, 0),
+        ]);
+        const hp = (id: string) => unitManager.getUnitById(id).value!.stats.currentHealth;
+        const heals = () => gameManager.getHistory().filter(event => event.type === "terrainHeal");
+
+        // A fifth of 20 HP on the first turn, and only up to full
+        expect(heals()).toEqual([{ type: "terrainHeal", unitId: "a", amount: 4 }, { type: "terrainHeal", unitId: "b", amount: 1 }]);
+        expect([hp("a"), hp("b"), hp("c")]).toEqual([14, 20, 10]);
+
+        gameManager.execute({ type: "endTurn" });
+        gameManager.execute({ type: "endTurn" });
+
+        expect(hp("a")).toBe(18);
+        expect(heals()).toHaveLength(3);
+    });
+
     it("skips a stunned unit's turn", () => {
         const { gameManager, unitManager } = game(["....."], [unit("a", P1, 0, 0), unit("e", ENEMY, 4, 0)]);
 
@@ -171,6 +192,43 @@ describe("AI", () => {
         gameManager.execute({ type: "endTurn" });
 
         expect(unitManager.getUnitById("e").value!.position).toEqual({ x: 4, y: 0 });
+    });
+
+    it("waits in ambush until something comes within reach", () => {
+        const { gameManager, unitManager } = game([".........."], [unit("a", P1, 0, 0, { stats: sturdy }), unit("e", ENEMY, 9, 0, { ai: "ambush" })], enemyAi);
+
+        // Nine tiles away is too far to move five and strike, so it stays put
+        expect(types(gameManager.execute({ type: "endTurn" }).value!)).toEqual(["turnStarted", "unitWaited", "turnStarted"]);
+        expect(unitManager.getUnitById("e").value!.position).toEqual({ x: 9, y: 0 });
+
+        // Six tiles away is close enough
+        gameManager.execute({ type: "moveTo", unitId: "a", destination: { x: 3, y: 0 } });
+        gameManager.execute({ type: "wait", unitId: "a" });
+        const events = gameManager.execute({ type: "endTurn" }).value!;
+
+        expect(events.find(event => event.type === "combat")).toMatchObject({ attackerId: "e", defenderId: "a" });
+        expect(unitManager.getUnitById("e").value!.position).toEqual({ x: 4, y: 0 });
+    });
+
+    it("holds its ground, attacking only what it can reach from where it stands", () => {
+        const { gameManager, unitManager } = game([".........."], [
+            unit("a", P1, 0, 0, { stats: sturdy }),
+            unit("near", P1, 7, 0, { stats: sturdy }),
+            unit("e", ENEMY, 9, 0, { ai: "hold", stats: sturdy }),
+        ], enemyAi);
+        const e = unitManager.getUnitById("e").value!;
+
+        // One step would bring "near" into reach, but it doesn't take it
+        expect(types(gameManager.execute({ type: "endTurn" }).value!)).not.toContain("combat");
+        expect(e.position).toEqual({ x: 9, y: 0 });
+
+        gameManager.execute({ type: "moveTo", unitId: "near", destination: { x: 8, y: 0 } });
+        gameManager.execute({ type: "wait", unitId: "near" });
+        const events = gameManager.execute({ type: "endTurn" }).value!;
+
+        expect(events.find(event => event.type === "combat")).toMatchObject({ attackerId: "e", defenderId: "near" });
+        expect(types(events)).not.toContain("unitMoved");
+        expect(e.position).toEqual({ x: 9, y: 0 });
     });
 
     it("can play both sides, a round at a time", () => {

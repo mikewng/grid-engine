@@ -21,6 +21,11 @@
     &--mountain { background-color: #a08159; }
     &--water { background-color: #3d7fcb; }
     &--block { background-color: #77736a; }
+    &--road { background-color: #c4a374; }
+    &--bridge { background-color: #b8874d; }
+    &--fort { background-color: #a8a294; }
+    &--sand { background-color: #e2c98a; }
+    &--village { background-color: #62a548; }
 
     // Overlays: ::before for the danger zone, ::after for the selected unit's ranges
     &::before,

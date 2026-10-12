@@ -31,6 +31,7 @@ const TerrainInfo = ({ tile, terrain, highlight }: TerrainInfoProps) => (
             <div className="ge-terrain-bonuses">
                 <span>DEF <strong>+{terrain.defense}</strong></span>
                 <span>AVO <strong>+{terrain.avoid}</strong></span>
+                {terrain.heal && <span>HEAL <strong>{Math.round(terrain.heal * 100)}%</strong></span>}
             </div>
             <div className="ge-terrain-costs">
                 {MOVEMENT_LABELS.map(([type, label]) => {

@@ -41,6 +41,27 @@
     }
 }
 
+.ge-map-picker {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+
+    select {
+        font: inherit;
+        color: var(--ge-text);
+        background: var(--ge-panel-raised);
+        border: 1px solid var(--ge-panel-border);
+        border-radius: 6px;
+        padding: 0.1rem 0.35rem;
+        cursor: pointer;
+
+        &:focus-visible {
+            outline: 2px solid var(--ge-gold);
+            outline-offset: 1px;
+        }
+    }
+}
+
 .ge-brand {
     display: flex;
     align-items: center;

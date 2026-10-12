@@ -199,6 +199,10 @@ export class GameManager {
 
         this.units.resetTurnFlags(faction);
 
+        for (const heal of this.status.healOnTerrain(faction)) {
+            events.push({ type: "terrainHeal", unitId: heal.unitId, amount: heal.amount });
+        }
+
         for (const tick of this.status.tickFaction(faction)) {
             if (tick.damage > 0) events.push({ type: "statusDamage", unitId: tick.unitId, damage: tick.damage });
             if (tick.defeated) events.push({ type: "unitDefeated", unitId: tick.unitId });

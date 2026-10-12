@@ -1,4 +1,4 @@
-import { UnitStats, UnitGrowths, UnitStatusEffect, UnitStatusType, UnitFaction, IUnit } from "./iunit";
+import { UnitStats, UnitGrowths, UnitStatusEffect, UnitStatusType, UnitFaction, IUnit, AiBehavior } from "./iunit";
 import { UnitClass } from "./unitclass";
 import { UnitSkill } from "./unitskills";
 import { createWeapon, WeaponDefinition, WeaponItem } from "../items/weaponitem";
@@ -22,6 +22,7 @@ export class Unit implements IUnit {
     hasActed: boolean;
     statusEffects: UnitStatusEffect[];
     unitFaction: UnitFaction;
+    ai: AiBehavior = "charge";
 
     constructor(
         id: string,
@@ -173,6 +174,7 @@ export class Unit implements IUnit {
         cloned.hasMoved = this.hasMoved;
         cloned.hasActed = this.hasActed;
         cloned.statusEffects = this.statusEffects.map(effect => ({ ...effect }));
+        cloned.ai = this.ai;
 
         return cloned;
     }
@@ -191,6 +193,8 @@ export interface UnitTemplate {
     /** Weapons it carries; the first one is equipped. */
     weapons?: WeaponDefinition[];
     skills?: UnitSkill[];
+    /** How the AI plays it. Defaults to "charge". */
+    ai?: AiBehavior;
 }
 
 /**
@@ -219,6 +223,8 @@ export function createUnit(template: UnitTemplate): Unit {
     for (const skill of template.skills ?? []) {
         unit.addSkill(skill);
     }
+
+    unit.ai = template.ai ?? "charge";
 
     return unit;
 }

@@ -47,6 +47,8 @@ function describe(event: GameEvent, unitOf: BattleLogProps["unitOf"]): ReactNode
             return <>{name(event.unitId)} waited</>;
         case "statusDamage":
             return <>{name(event.unitId)} took {event.damage} poison damage</>;
+        case "terrainHeal":
+            return <>{name(event.unitId)} recovered {event.amount} HP</>;
         case "unitDefeated":
             return <span className="ge-log-defeat">{name(event.unitId)} was defeated</span>;
         case "gameOver":

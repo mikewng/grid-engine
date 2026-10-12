@@ -57,7 +57,7 @@ export interface FloatingText {
     x: number;
     y: number;
     text: string;
-    kind: "damage" | "crit" | "miss" | "poison" | "break" | "info";
+    kind: "damage" | "crit" | "miss" | "poison" | "heal" | "break" | "info";
 }
 
 /** Damage numbers and "MISS" popping up over units. */

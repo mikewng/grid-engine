@@ -13,6 +13,8 @@ const KILL_BONUS = 50;
  * A straightforward AI. If the unit can reach an attack this turn it takes the
  * best-scoring one (expected damage dealt, a bonus for kills, minus expected
  * damage taken). Otherwise it marches toward the nearest enemy it can reach.
+ * Each unit's `ai` behaviour can rein that in: "ambush" units wait until
+ * something comes within reach, and "hold" units never leave their tile.
  */
 export class BasicAi implements AiController {
     constructor(
@@ -26,7 +28,7 @@ export class BasicAi implements AiController {
         const unit = this.units.getUnitById(unitId).value;
         if (!unit || !unit.isAlive) return [];
 
-        const attack = this.bestAttack(unit);
+        const attack = this.bestAttack(unit, unit.ai === "hold" ? [unit.position] : undefined);
 
         if (attack) {
             const commands: GameCommand[] = [];
@@ -39,6 +41,8 @@ export class BasicAi implements AiController {
             return commands;
         }
 
+        if (unit.ai !== "charge") return [{ type: "wait", unitId }];
+
         const approach = this.approachTile(unit);
 
         if (approach && (approach.x !== unit.position.x || approach.y !== unit.position.y)) {
@@ -48,8 +52,9 @@ export class BasicAi implements AiController {
         return [{ type: "wait", unitId }];
     }
 
-    private bestAttack(unit: IUnit): { from: Coordinate; targetId: string } | null {
-        const range = this.movement.getMovementRange(unit.id);
+    /** The best attack from any of `tiles` (by default, anywhere the unit can move this turn). */
+    private bestAttack(unit: IUnit, tiles?: Coordinate[]): { from: Coordinate; targetId: string } | null {
+        const range = tiles ? { success: true as const, value: tiles } : this.movement.getMovementRange(unit.id);
         const map = this.movement.getDistanceMap(unit.id);
         if (!range.success || !map.success) return null;
 

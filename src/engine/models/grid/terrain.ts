@@ -11,6 +11,8 @@ export interface TerrainDefinition {
     avoid: number;
     /** Added to the defense (not resistance) of a unit standing here. */
     defense: number;
+    /** Share of max HP restored to a unit that starts its turn here (a fort's 0.2). */
+    heal?: number;
 }
 
 export type TerrainTable = Record<TileType, TerrainDefinition>;

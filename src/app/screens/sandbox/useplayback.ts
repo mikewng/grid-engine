@@ -317,6 +317,17 @@ export function usePlayback(speed: number) {
                     break;
                 }
 
+                case "terrainHeal": {
+                    const visual = current[event.unitId];
+                    if (!visual) break;
+
+                    visual.hp += event.amount;
+                    show();
+                    float(visual, `+${event.amount}`, "heal");
+                    if (!await pause(650)) return;
+                    break;
+                }
+
                 case "unitDefeated": {
                     const visual = current[event.unitId];
                     if (!visual) break;

@@ -34,5 +34,7 @@ export type GameEvent =
     | { type: "combat"; attackerId: string; defenderId: string; outcome: CombatOutcome }
     | { type: "unitWaited"; unitId: string }
     | { type: "statusDamage"; unitId: string; damage: number }
+    /** Recovered HP at the start of its turn, standing on terrain that heals (a fort). */
+    | { type: "terrainHeal"; unitId: string; amount: number }
     | { type: "unitDefeated"; unitId: string }
     | { type: "gameOver"; winner: UnitFaction | null };

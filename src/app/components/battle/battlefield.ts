@@ -177,7 +177,21 @@ function drawScenery(ctx: CanvasRenderingContext2D, terrain: TileType, width: nu
             break;
         }
 
-        case TileType.Water: {
+        case TileType.Sand: {
+            // Dunes rolling away, then the sand itself
+            for (let x = 0; x < width; x++) {
+                const y = Math.round(horizon - 7 - Math.sin(x / 23) * 4 - Math.sin(x / 9 + 2) * 2);
+                ctx.fillStyle = "#d9bb7a";
+                ctx.fillRect(x, y, 1, horizon - y);
+                ctx.fillStyle = "#ecd39a";
+                ctx.fillRect(x, y, 1, 1);
+            }
+            ground(ctx, horizon, width, height, "#e2c98a", "#d4b878", "#c9ad6c", random);
+            break;
+        }
+
+        case TileType.Water:
+        case TileType.Bridge: {
             ctx.fillStyle = "#6f9a5a";
             fillEllipse(ctx, width * 0.75, horizon, 22, 6);
             ctx.fillStyle = "#3d7fcb";
@@ -215,6 +229,11 @@ const PLATFORM: Record<TileType, { top: string; edge: string; front: string; sid
     [TileType.Mountain]: { top: "#b19f7c", edge: "#cdbd98", front: "#94845f", side: "#75654a", base: "#5a4c36", detail: "#7d6d50" },
     [TileType.Water]: { top: "#4a8fd8", edge: "#8ec3f2", front: "#3d7fcb", side: "#2d63a3", base: "#21508a", detail: "#d8ecff" },
     [TileType.Block]: { top: "#8a857a", edge: "#a5a095", front: "#77736a", side: "#5c5850", base: "#46433d", detail: "#6a665d" },
+    [TileType.Road]: { top: "#c4a374", edge: "#dcc394", front: "#a3845c", side: "#7a5a3a", base: "#5e4229", detail: "#a3845c" },
+    [TileType.Bridge]: { top: "#b8874d", edge: "#d4a56c", front: "#94683a", side: "#5e3d1c", base: "#3d7fcb", detail: "#5e3d1c" },
+    [TileType.Fort]: { top: "#a8a294", edge: "#cfc9b8", front: "#7d786c", side: "#5c5850", base: "#46433d", detail: "#7d786c" },
+    [TileType.Sand]: { top: "#e2c98a", edge: "#f2e2b0", front: "#c9ad6c", side: "#a88a52", base: "#7d6638", detail: "#c9ad6c" },
+    [TileType.Village]: { top: "#78b85a", edge: "#9bd47a", front: "#5f9a46", side: "#7a5a3a", base: "#5e4229", detail: "#4e8c3c" },
 };
 
 /** The slab a fighter stands on, made of whole-pixel rows. Up close, the two meet in the middle. */

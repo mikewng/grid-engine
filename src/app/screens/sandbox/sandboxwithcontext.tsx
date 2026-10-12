@@ -1,11 +1,11 @@
 'use client'
 
 import { GameConfig, GameProvider } from '@/app/context/gamecontext';
-import { testScenario } from '../../data/game/testscenario';
+import { SCENARIOS } from '../../data/game/scenarios';
 import SandboxGame from './sandboxgame';
 
 const gameConfig: GameConfig = {
-    scenario: testScenario,
+    scenario: SCENARIOS[0].scenario,
     gameMode: 'sandbox',
     difficulty: 'normal',
 };
