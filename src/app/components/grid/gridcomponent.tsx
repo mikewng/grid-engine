@@ -3,6 +3,7 @@ import { Grid } from "@/engine/models/grid/grid";
 import { Tile } from "@/engine/models/grid/tile";
 import { coordinateKey } from "@/engine/models/grid/coordinate";
 import TileComponent from "@/app/components/tile/tilecomponent";
+import { TerrainStyles } from "@/app/components/pixel/terrainart";
 
 import "./gridcomponent.scss"
 
@@ -74,6 +75,7 @@ const GridComponent: React.FC<GridProps> = ({
                 onCancel();
             })}
         >
+            <TerrainStyles />
             <div className="ge-board-tiles" role="grid" aria-label={`${grid.width} by ${grid.height} map`}>
                 {grid.gridcontent.flat().map((tile) => {
                     const key = coordinateKey(tile);

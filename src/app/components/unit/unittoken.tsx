@@ -1,7 +1,8 @@
 import React, { CSSProperties, memo } from "react";
 import { WeaponType } from "@/engine/models/items/weaponitem";
 import { UnitFaction } from "@/engine/models/units/iunit";
-import WeaponIcon from "@/app/components/icons/weaponicon";
+import { MovementType } from "@/engine/models/units/unitclass";
+import { UnitSprite } from "@/app/components/pixel/unitsprites";
 
 import "./unittoken.scss"
 
@@ -11,12 +12,13 @@ export interface UnitTokenProps {
     name: string;
     faction: UnitFaction;
     weaponType: WeaponType | undefined;
+    movement: MovementType;
+    /** Picks the sprite's hair colour: the unit's id. */
+    seed: string;
     hp: number;
     maxHp: number;
-    /** Done for this turn: drawn greyed out. */
+    /** Done for this turn: drawn greyed out and still. */
     acted?: boolean;
-    /** Can still be given orders: gently bobs. */
-    ready?: boolean;
     selected?: boolean;
     /** Leaning toward an enemy mid-strike: the direction to lean in. */
     lunge?: { dx: number; dy: number };
@@ -32,13 +34,12 @@ export const hpTone = (hp: number, maxHp: number) => {
 
 /** A unit on the map, positioned by tile. Moving it to a new tile glides it there. */
 const UnitToken: React.FC<UnitTokenProps> = memo(({
-    x, y, name, faction, weaponType, hp, maxHp, acted, ready, selected, lunge, hurt, dying,
+    x, y, name, faction, weaponType, movement, seed, hp, maxHp, acted, selected, lunge, hurt, dying,
 }) => {
     const classes = [
         "ge-token",
         `faction-${UnitFaction[faction].toLowerCase()}`,
         acted && "is-acted",
-        ready && "is-ready",
         selected && "is-selected",
         lunge && "is-lunging",
         hurt && `is-hurt is-hurt-${hurt}`,
@@ -57,9 +58,7 @@ const UnitToken: React.FC<UnitTokenProps> = memo(({
     return (
         <div className={classes} style={style} title={`${name} (${hp}/${maxHp} HP)`}>
             <div className="ge-token-body">
-                <div className="ge-token-badge">
-                    <WeaponIcon type={weaponType} className="ge-token-icon" />
-                </div>
+                <UnitSprite className="ge-token-sprite" movement={movement} weapon={weaponType} faction={faction} seed={seed} />
                 <div className="ge-token-hp">
                     <span className={`ge-token-hp-fill hp-${hpTone(hp, maxHp)}`} style={{ width: `${healthPercent}%` }} />
                 </div>

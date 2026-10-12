@@ -5,6 +5,7 @@ import { Coordinate } from "@/engine/models/grid/coordinate";
 import { IUnit, UnitFaction } from "@/engine/models/units/iunit";
 import { CombatOutcome } from "@/engine/rules/combatresolver";
 import { FloatingText } from "@/app/components/map/mapoverlays";
+import { BattleScript, FRAME_MS } from "@/app/components/battle/battlescript";
 
 /** How a unit looks at one moment of a replay. */
 export interface UnitVisual {
@@ -33,6 +34,19 @@ export interface BattleView {
     active: "attacker" | "defender" | null;
 }
 
+/** A fight playing out on the battle screen. */
+export interface SceneView {
+    attackerId: string;
+    defenderId: string;
+    script: BattleScript;
+    /** The tiles they fight from. */
+    attackerAt: Coordinate;
+    defenderAt: Coordinate;
+    /** performance.now() when it started, and the speed it plays at. */
+    startedAt: number;
+    speed: number;
+}
+
 export interface Motion {
     lunge?: { unitId: string; dx: number; dy: number };
     hurt?: { unitId: string; kind: "hit" | "crit" };
@@ -43,6 +57,8 @@ export interface PlaybackContext {
     banner(faction: UnitFaction, turn: number): BannerInfo;
     /** AI units get a beat of focus before they move, so the player can follow along. */
     isAi(unitId: string): boolean;
+    /** The battle screen for a fight, or null to play it out on the map instead. */
+    battleScene(event: Extract<GameEvent, { type: "combat" }>): BattleScript | null;
 }
 
 /** Where every unit is and how it looks right now, to replay events from. */
@@ -71,6 +87,7 @@ export function usePlayback(speed: number) {
     const [floats, setFloats] = useState<FloatingText[]>([]);
     const [banner, setBanner] = useState<BannerInfo | null>(null);
     const [battle, setBattle] = useState<BattleView | null>(null);
+    const [scene, setScene] = useState<SceneView | null>(null);
     const [motion, setMotion] = useState<Motion>({});
     const [focus, setFocus] = useState<Coordinate | null>(null);
     const [playing, setPlaying] = useState(false);
@@ -93,6 +110,7 @@ export function usePlayback(speed: number) {
         setFloats([]);
         setBanner(null);
         setBattle(null);
+        setScene(null);
         setMotion({});
         setFocus(null);
         setPlaying(false);
@@ -212,6 +230,30 @@ export function usePlayback(speed: number) {
                     if (!attacker || !defender) break;
 
                     setFocus(null);
+
+                    const script = context.battleScene(event);
+
+                    if (script) {
+                        // The battle screen covers the map, and the two tokens catch up once it's done
+                        setScene({
+                            attackerId,
+                            defenderId,
+                            script,
+                            attackerAt: { x: attacker.x, y: attacker.y },
+                            defenderAt: { x: defender.x, y: defender.y },
+                            startedAt: performance.now(),
+                            speed: speedRef.current,
+                        });
+                        if (!await pause(script.total * FRAME_MS)) return;
+
+                        attacker.hp = outcome.attackerHp;
+                        defender.hp = outcome.defenderHp;
+                        attacker.acted = true;
+                        show();
+                        setScene(null);
+                        break;
+                    }
+
                     setBattle({ attackerId, defenderId, outcome, attackerHp: attacker.hp, defenderHp: defender.hp, active: null });
                     if (!await pause(380)) return;
 
@@ -297,5 +339,5 @@ export function usePlayback(speed: number) {
         if (runId.current === id) clear();
     }, [clear]);
 
-    return { playing, visuals, floats, banner, battle, motion, focus, play, skip };
+    return { playing, visuals, floats, banner, battle, scene, motion, focus, play, skip };
 }

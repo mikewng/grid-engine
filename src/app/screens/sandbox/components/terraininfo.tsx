@@ -2,6 +2,7 @@ import { Coordinate } from "@/engine/models/grid/coordinate";
 import { TileType } from "@/engine/models/grid/itile";
 import { TerrainDefinition } from "@/engine/models/grid/terrain";
 import { MovementType } from "@/engine/models/units/unitclass";
+import { TerrainStyles } from "@/app/components/pixel/terrainart";
 
 const MOVEMENT_LABELS: [MovementType, string][] = [
     [MovementType.INFANTRY, "Foot"],
@@ -20,6 +21,7 @@ interface TerrainInfoProps {
 /** What a tile's terrain does: cover and how hard it is to cross. */
 const TerrainInfo = ({ tile, terrain, highlight }: TerrainInfoProps) => (
     <section className="ge-panel ge-terrain" aria-label="Terrain">
+        <TerrainStyles />
         <div className={`ge-terrain-swatch ge-tile ge-tile--${TileType[terrain.type].toLowerCase()}`} aria-hidden="true" />
         <div className="ge-terrain-body">
             <div className="ge-terrain-head">

@@ -1,4 +1,4 @@
-import { weaponCoversDistance } from "../models/items/weaponitem";
+import { weaponCoversDistance, WeaponType } from "../models/items/weaponitem";
 import { roll100, Rng } from "../utils/rng";
 import { Combatant, CombatRules, HitRollStyle } from "./ruleset";
 
@@ -31,6 +31,8 @@ export function rngRoller(rng: Rng, style: HitRollStyle): CombatRoller {
 export interface CombatSideStats {
     unitId: string;
     weaponName: string | undefined;
+    /** Kept here because a weapon that breaks in the fight is gone from the unit afterwards. */
+    weaponType: WeaponType | undefined;
     /** HP going in. */
     hp: number;
     /** Whether its weapon reaches the other side at this distance. */
@@ -100,6 +102,7 @@ export function resolveCombat(setup: CombatSetup, rules: CombatRules, roller: Co
     const sideStats = (self: Combatant, other: Combatant): CombatSideStats => ({
         unitId: self.unit.id,
         weaponName: self.weapon?.name,
+        weaponType: self.weapon?.weaponType,
         hp: self.unit.stats.currentHealth,
         canAttack: canAttack(self),
         damage: Math.max(0, rules.attack(self, other) - rules.defense(other, self)),

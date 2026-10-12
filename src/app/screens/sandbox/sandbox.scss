@@ -1,3 +1,5 @@
+@use "../../styles/pixel";
+
 .ge-loading {
     padding: 3rem;
     text-align: center;
@@ -403,51 +405,50 @@
     margin-top: 0.5rem;
 }
 
-// --- Windows over the map (inside GridComponent's overlay layer) ---
+// --- Windows over the map (inside GridComponent's overlay layer, on the map's pixel grid) ---
 
 .ge-action-menu {
+    @include pixel.window(#3b5bb5, #1f3478);
     position: absolute;
     z-index: 7;
     pointer-events: auto;
     display: flex;
     flex-direction: column;
     min-width: 8.5rem;
-    padding: 0.3rem;
-    border-radius: 10px;
-    background: linear-gradient(180deg, var(--ge-window-top) 0%, var(--ge-window-bottom) 100%);
-    border: 1px solid var(--ge-gold-soft);
-    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.5), 0 12px 28px rgba(0, 0, 0, 0.55);
-    animation: ge-menu-in 140ms ease-out;
+    padding: calc(var(--px) * 4);
+    font-size: max(13px, calc(var(--px) * 6.5));
+    animation: ge-menu-in 150ms steps(3, end);
 
     button {
         display: flex;
         align-items: center;
         justify-content: space-between;
         gap: 1rem;
-        padding: 0.5rem 0.65rem 0.5rem 1.2rem;
+        padding: calc(var(--px) * 2) calc(var(--px) * 3) calc(var(--px) * 2) calc(var(--px) * 8);
         border: 0;
-        border-radius: 7px;
+        border-radius: 0;
         background: transparent;
-        color: var(--ge-text);
-        font-weight: 600;
+        color: #fff;
+        font: inherit;
+        text-shadow: inherit;
         text-align: left;
         cursor: pointer;
         position: relative;
 
+        // The pointing hand, as a little arrow
         &::before {
             content: "▶";
             position: absolute;
-            left: 0.4rem;
-            font-size: 0.55rem;
+            left: calc(var(--px) * 2);
+            font-size: 0.6em;
             color: var(--ge-gold);
             opacity: 0;
-            transition: opacity 100ms ease;
         }
 
         &:hover,
         &:focus-visible {
             outline: none;
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.14);
 
             &::before {
                 opacity: 1;
@@ -459,13 +460,18 @@
         }
 
         &.is-cancel {
-            color: var(--ge-text-muted);
+            color: #c9d3e8;
+        }
+
+        kbd {
+            border-radius: 0;
+            text-shadow: none;
         }
     }
 }
 
 @keyframes ge-menu-in {
-    from { opacity: 0; scale: 0.94; }
+    from { opacity: 0; scale: 0.9; }
     to { opacity: 1; scale: 1; }
 }
 
@@ -477,39 +483,44 @@
     align-items: center;
     overflow: hidden;
 
-    --band: rgba(36, 86, 190, 0.85);
-    &.tone-enemy { --band: rgba(170, 30, 40, 0.85); }
-    &.tone-ally { --band: rgba(30, 130, 75, 0.85); }
-    &.tone-neutral { --band: rgba(160, 110, 20, 0.85); }
+    --band: #2456be;
+    &.tone-enemy { --band: #aa1e28; }
+    &.tone-ally { --band: #1e824b; }
+    &.tone-neutral { --band: #a06e14; }
 
     .ge-phase-banner-band {
         width: 100%;
         display: flex;
         flex-direction: column;
         align-items: center;
-        padding: calc(var(--tile) * 0.35) 0;
-        background: linear-gradient(90deg, transparent 0%, var(--band) 18%, var(--band) 82%, transparent 100%);
-        border-top: 2px solid rgba(255, 255, 255, 0.35);
-        border-bottom: 2px solid rgba(255, 255, 255, 0.35);
-        animation: ge-banner 1.15s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+        padding: calc(var(--px) * 6) 0;
+        background: linear-gradient(180deg,
+            color-mix(in srgb, var(--band) 75%, #fff) 0 18%,
+            var(--band) 18% 82%,
+            color-mix(in srgb, var(--band) 70%, #000) 82%);
+        box-shadow:
+            0 calc(var(--px) * -1) 0 #1b1a26,
+            0 var(--px) 0 #1b1a26,
+            0 calc(var(--px) * -3) 0 rgba(255, 255, 255, 0.7),
+            0 calc(var(--px) * 3) 0 rgba(255, 255, 255, 0.7);
+        animation: ge-banner 1.15s steps(6, end) both;
     }
 
     .ge-phase-banner-title {
-        font-size: clamp(1.4rem, calc(var(--tile) * 0.95), 3.2rem);
-        font-weight: 900;
-        font-style: italic;
-        letter-spacing: 0.18em;
+        @include pixel.outlined-text;
+        font-size: clamp(1.4rem, calc(var(--px) * 16), 3.4rem);
+        font-weight: 600;
+        letter-spacing: 0.12em;
+        line-height: 1.1;
         text-transform: uppercase;
-        color: #fff;
-        text-shadow: 0 3px 0 rgba(0, 0, 0, 0.35), 0 0 24px rgba(255, 255, 255, 0.35);
     }
 
     .ge-phase-banner-sub {
-        font-size: clamp(0.75rem, calc(var(--tile) * 0.32), 1.1rem);
-        font-weight: 600;
+        @include pixel.outlined-text(rgba(255, 255, 255, 0.9));
+        font-size: clamp(0.75rem, calc(var(--px) * 6), 1.2rem);
+        font-weight: 500;
         letter-spacing: 0.3em;
         text-transform: uppercase;
-        color: rgba(255, 255, 255, 0.85);
     }
 }
 
@@ -528,40 +539,34 @@
     display: grid;
     place-items: center;
     background: rgba(5, 8, 18, 0.55);
-    backdrop-filter: blur(2px);
-    animation: ge-fade-in 300ms ease-out;
+    animation: ge-fade-in 300ms steps(4, end);
 
     .ge-game-over-card {
+        @include pixel.window(#3b5bb5, #1f3478);
         min-width: min(22rem, 90%);
-        padding: 1.75rem 2.25rem;
+        padding: calc(var(--px) * 10) calc(var(--px) * 14);
         text-align: center;
-        border-radius: 16px;
-        background: linear-gradient(180deg, var(--ge-window-top) 0%, var(--ge-window-bottom) 100%);
-        border: 1px solid var(--ge-gold-soft);
-        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
-        animation: ge-pop-in 380ms cubic-bezier(0.2, 1.4, 0.4, 1);
+        animation: ge-pop-in 300ms steps(3, end);
 
         p {
             margin: 0.4rem 0 1.25rem;
-            color: var(--ge-text-muted);
+            color: #c9d3e8;
         }
     }
 
     .ge-game-over-title {
-        font-size: 2.6rem;
-        font-weight: 900;
+        font-size: 2.8rem;
+        font-weight: 600;
         letter-spacing: 0.12em;
         text-transform: uppercase;
     }
 
     &.is-victory .ge-game-over-title {
-        color: var(--ge-gold);
-        text-shadow: 0 0 28px rgba(230, 201, 119, 0.5);
+        @include pixel.outlined-text(var(--ge-gold));
     }
 
     &.is-defeat .ge-game-over-title {
-        color: var(--ge-bad);
-        text-shadow: 0 0 28px rgba(255, 93, 93, 0.45);
+        @include pixel.outlined-text(#ff7a7a);
     }
 }
 
@@ -576,19 +581,16 @@
 }
 
 .ge-toast {
+    @include pixel.window(#8a2430, #4e1018);
     position: absolute;
     top: 3%;
     left: 50%;
     z-index: 11;
     max-width: 80%;
-    padding: 0.55rem 0.9rem;
-    border-radius: 10px;
-    background: rgba(48, 12, 18, 0.95);
-    border: 1px solid rgba(255, 93, 93, 0.6);
-    box-shadow: 0 10px 26px rgba(0, 0, 0, 0.5);
-    font-size: 0.88rem;
+    padding: calc(var(--px) * 4) calc(var(--px) * 7);
+    font-size: max(13px, calc(var(--px) * 6));
     transform: translateX(-50%);
-    animation: ge-toast-in 200ms ease-out;
+    animation: ge-toast-in 200ms steps(3, end);
 }
 
 @keyframes ge-toast-in {
@@ -597,6 +599,7 @@
 }
 
 .ge-skip {
+    @include pixel.window(#2a3350, #121829);
     position: absolute;
     top: 2.5%;
     right: 1.5%;
@@ -605,17 +608,17 @@
     display: inline-flex;
     align-items: center;
     gap: 0.45rem;
-    padding: 0.35rem 0.75rem;
-    border-radius: 99px;
-    border: 1px solid rgba(255, 255, 255, 0.25);
-    background: rgba(8, 12, 24, 0.75);
-    color: var(--ge-text);
-    font-size: 0.8rem;
-    font-weight: 600;
+    padding: calc(var(--px) * 3) calc(var(--px) * 6);
+    font-size: max(12px, calc(var(--px) * 5));
     cursor: pointer;
 
     &:hover {
-        background: rgba(8, 12, 24, 0.9);
+        filter: brightness(1.2);
+    }
+
+    kbd {
+        border-radius: 0;
+        text-shadow: none;
     }
 }
 

@@ -1,0 +1,343 @@
+import { memo } from "react";
+import { WeaponType } from "@/engine/models/items/weaponitem";
+import { UnitFaction } from "@/engine/models/units/iunit";
+import { MovementType } from "@/engine/models/units/unitclass";
+import { bob, outline, overlay, Palette, paths, Pixels, pixels } from "./pixelart";
+import { COLORS, FACTION_COLORS, hairOf, hairShadow } from "./palettes";
+
+// Units on the map: 18 x 18 sprites, drawn over a 16-pixel tile so they can
+// spill a pixel over its edges. Bodies come in a few shapes; the weapon goes in
+// the hand; everything gets an outline; a second frame bobs for the idle loop.
+
+const SIZE = 18;
+
+type Body = "foot" | "robe" | "armor" | "horse" | "pegasus";
+
+interface BodyArt {
+    pixels: Pixels;
+    /** Rows above this move down a pixel in the idle frame. */
+    split: number;
+    /** Where the weapon's grip goes. */
+    hand: [number, number];
+    /** Where a tome sits, top-left. */
+    book: [number, number];
+}
+
+const FOOT: BodyArt = {
+    pixels: pixels(`
+        ..................
+        ..................
+        ..................
+        ......hhhhhh......
+        .....hhhhhhhh.....
+        .....hHhhhhHh.....
+        .....hssssssh.....
+        .....hskssksh.....
+        ......ssssss......
+        .....mmllllmm.....
+        ....smmmmmmmms....
+        ....smmmmmmmms....
+        .....dbbybbbd.....
+        .....dddddddd.....
+        .....pp....pp.....
+        .....bb....bb.....
+        ..................
+        ..................
+    `),
+    split: 14,
+    hand: [14, 10],
+    book: [7, 10],
+};
+
+const ROBE: BodyArt = {
+    ...FOOT,
+    pixels: overlay(FOOT.pixels, pixels(`
+        ..................
+        ..................
+        ..................
+        ..................
+        ..................
+        ..................
+        ..................
+        ..................
+        ..................
+        ..................
+        ..................
+        ..................
+        .....mbbybbm......
+        .....mmmmmmmm.....
+        ....dmmmmmmmmd....
+        ....dddddddddd....
+        ..................
+        ..................
+    `)),
+};
+
+const ARMOR: BodyArt = {
+    pixels: pixels(`
+        ..................
+        .......mm.........
+        ......gggggg......
+        .....gggggggg.....
+        .....gwggggGg.....
+        .....gkkkkkkg.....
+        .....gGggggGg.....
+        ......GGGGGG......
+        ...ggmmmmmmmmgg...
+        .yyyymmllllmmmGs..
+        .ymmymmmmmmmmmGs..
+        .ymmymbbybbbmG....
+        .yyyyGGGGGGGG.....
+        ..yy.GG....GG.....
+        .....GG....GG.....
+        .....pp....pp.....
+        ..................
+        ..................
+    `),
+    split: 13,
+    hand: [14, 10],
+    book: [7, 10],
+};
+
+const HORSE: BodyArt = {
+    pixels: pixels(`
+        ..................
+        ..................
+        ......hhhh........
+        .....hhhhhh.......
+        .....hhhssk.......
+        ......ssss........
+        .....mmmmms..rr...
+        .....mlmmmm.rrrr..
+        .....mmmmm.rrrkrr.
+        .t....dddd.rrrRR..
+        .tt.rrrrddrrrr....
+        .t.rrrrrbbrrrrr...
+        .t.rrrrrrrrrrrr...
+        ....rRRRRRRRRr....
+        ....R.r....R.r....
+        ....R.r....R.r....
+        ....f.f....f.f....
+        ..................
+    `),
+    split: 13,
+    hand: [11, 8],
+    book: [9, 6],
+};
+
+const PEGASUS: BodyArt = {
+    ...HORSE,
+    pixels: overlay(
+        // Wings behind the rider, then legs tucked up in flight
+        overlay(pixels(`
+            ..................
+            ..W...............
+            .WwW..............
+            .WwwW.............
+            ..WwwW............
+            ...WwwW...........
+            ....WwwW..........
+            .....WWW..........
+            ..................
+            ..................
+            ..................
+            ..................
+            ..................
+            ..................
+            ..................
+            ..................
+            ..................
+            ..................
+        `), HORSE.pixels).map((row, y) => (y >= 14 ? ".".repeat(SIZE) : row)),
+        pixels(`
+            ..................
+            ..................
+            ..................
+            ..................
+            ..................
+            ..................
+            ..................
+            ..................
+            ..................
+            ..................
+            ..................
+            ..................
+            ..................
+            ..................
+            .....RR.....RR....
+            ......f......f....
+            ..................
+            ..................
+        `),
+    ),
+};
+
+const BODIES: Record<Body, BodyArt> = { foot: FOOT, robe: ROBE, armor: ARMOR, horse: HORSE, pegasus: PEGASUS };
+
+/** Weapons, upright, with the pixel that sits in the hand. */
+const WEAPONS: Partial<Record<WeaponType, { pixels: Pixels; grip: [number, number] }>> = {
+    [WeaponType.SWORD]: {
+        pixels: pixels(`
+            .w.
+            .g.
+            .g.
+            .g.
+            .g.
+            yyy
+            .b.
+        `),
+        grip: [1, 6],
+    },
+    [WeaponType.AXE]: {
+        pixels: pixels(`
+            .gg
+            ngG
+            ngg
+            n..
+            n..
+            n..
+        `),
+        grip: [0, 5],
+    },
+    [WeaponType.SPEAR]: {
+        pixels: pixels(`
+            .w.
+            ggg
+            .y.
+            .n.
+            .n.
+            .n.
+            .n.
+            .n.
+            .n.
+            .n.
+        `),
+        grip: [1, 7],
+    },
+    [WeaponType.BOW]: {
+        pixels: pixels(`
+            n..
+            .n.
+            .nw
+            .nw
+            .nw
+            .n.
+            n..
+        `),
+        grip: [1, 3],
+    },
+    [WeaponType.STAFF]: {
+        pixels: pixels(`
+            .o.
+            ooo
+            .o.
+            .n.
+            .n.
+            .n.
+            .n.
+        `),
+        grip: [1, 5],
+    },
+};
+
+const BOOK = pixels(`
+    TTTT
+    TwwT
+    TTTT
+`);
+
+const blank = (): string[] => Array.from({ length: SIZE }, () => ".".repeat(SIZE));
+
+/** `motif` placed on an empty sprite-sized canvas with its top-left at (x, y). */
+function place(motif: Pixels, x: number, y: number): Pixels {
+    const rows = blank();
+    motif.forEach((line, dy) => {
+        const row = rows[y + dy];
+        if (row === undefined) return;
+        rows[y + dy] = [...row].map((pixel, col) => {
+            const over = line[col - x];
+            return over && over !== "." ? over : pixel;
+        }).join("");
+    });
+    return rows;
+}
+
+export function bodyOf(movement: MovementType, weapon: WeaponType | undefined): Body {
+    switch (movement) {
+        case MovementType.MOUNTED: return "horse";
+        case MovementType.FLYING: return "pegasus";
+        case MovementType.ARMORED: return "armor";
+        default: return weapon === WeaponType.BMAGIC || weapon === WeaponType.WMAGIC || weapon === WeaponType.STAFF ? "robe" : "foot";
+    }
+}
+
+/** Both frames of a unit's map sprite, outlined, before colouring. */
+export function spriteFrames(movement: MovementType, weapon: WeaponType | undefined): [Pixels, Pixels] {
+    const body = BODIES[bodyOf(movement, weapon)];
+    let rows = body.pixels;
+
+    if (weapon === WeaponType.BMAGIC || weapon === WeaponType.WMAGIC) {
+        rows = overlay(rows, place(BOOK, ...body.book));
+    } else if (weapon !== undefined && WEAPONS[weapon]) {
+        const { pixels: art, grip } = WEAPONS[weapon]!;
+        rows = overlay(rows, place(art, body.hand[0] - grip[0], body.hand[1] - grip[1]));
+    }
+
+    return [outline(rows), outline(bob(rows, body.split))];
+}
+
+export function spritePalette(movement: MovementType, weapon: WeaponType | undefined, faction: UnitFaction, seed: string): Palette {
+    const cloth = FACTION_COLORS[faction];
+    const hair = hairOf(seed);
+    const flying = movement === MovementType.FLYING;
+
+    return {
+        k: COLORS.ink,
+        s: COLORS.skin,
+        h: hair,
+        H: hairShadow(hair),
+        m: cloth.main,
+        d: cloth.dark,
+        l: cloth.light,
+        b: COLORS.leather,
+        p: COLORS.pants,
+        y: COLORS.gold,
+        g: COLORS.steel,
+        G: COLORS.steelDark,
+        w: COLORS.white,
+        W: COLORS.pegasusDark,
+        n: COLORS.wood,
+        o: COLORS.orb,
+        T: weapon === WeaponType.WMAGIC ? COLORS.tomeLight : COLORS.tomeAnima,
+        r: flying ? COLORS.pegasus : COLORS.horse,
+        R: flying ? COLORS.pegasusDark : COLORS.horseDark,
+        t: flying ? COLORS.pegasusMane : COLORS.mane,
+        f: COLORS.hoof,
+    };
+}
+
+interface UnitSpriteProps {
+    movement: MovementType;
+    weapon: WeaponType | undefined;
+    faction: UnitFaction;
+    /** Picks the hair colour: the unit's id. */
+    seed: string;
+    className?: string;
+}
+
+/** A unit's map sprite: two frames, which CSS takes turns showing. */
+export const UnitSprite = memo(({ movement, weapon, faction, seed, className }: UnitSpriteProps) => {
+    const palette = spritePalette(movement, weapon, faction, seed);
+
+    return (
+        <svg className={`ge-sprite${className ? ` ${className}` : ""}`} viewBox={`0 0 ${SIZE} ${SIZE}`} shapeRendering="crispEdges" aria-hidden="true">
+            {spriteFrames(movement, weapon).map((frame, i) => (
+                <g key={i} className={`ge-sprite-frame ge-sprite-frame--${i}`}>
+                    {paths(frame, palette).map(({ color, d }) => <path key={color} fill={color} d={d} />)}
+                </g>
+            ))}
+        </svg>
+    );
+});
+
+UnitSprite.displayName = "UnitSprite";

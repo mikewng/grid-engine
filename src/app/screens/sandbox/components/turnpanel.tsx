@@ -13,17 +13,20 @@ interface TurnPanelProps {
     dangerZone: boolean;
     autoEnd: boolean;
     fast: boolean;
+    /** Fights play on the battle screen, rather than on the map. */
+    battleScenes: boolean;
     onEndTurn: () => void;
     onReset: () => void;
     onToggleDangerZone: () => void;
     onToggleAutoEnd: () => void;
     onToggleFast: () => void;
+    onToggleBattleScenes: () => void;
 }
 
 /** Whose turn it is, what to do next, and the turn-level buttons. */
 const TurnPanel = ({
-    turn, isHumanTurn, playing, readyCount, unitCount, hint, dangerZone, autoEnd, fast,
-    onEndTurn, onReset, onToggleDangerZone, onToggleAutoEnd, onToggleFast,
+    turn, isHumanTurn, playing, readyCount, unitCount, hint, dangerZone, autoEnd, fast, battleScenes,
+    onEndTurn, onReset, onToggleDangerZone, onToggleAutoEnd, onToggleFast, onToggleBattleScenes,
 }: TurnPanelProps) => {
     const allDone = isHumanTurn && readyCount === 0;
 
@@ -79,6 +82,10 @@ const TurnPanel = ({
                 <label>
                     <input type="checkbox" checked={fast} onChange={onToggleFast} />
                     Fast animations
+                </label>
+                <label>
+                    <input type="checkbox" checked={battleScenes} onChange={onToggleBattleScenes} />
+                    Battle animations
                 </label>
             </div>
         </section>

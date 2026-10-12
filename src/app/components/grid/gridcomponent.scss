@@ -13,6 +13,13 @@
         0 0 0 4px var(--ge-gold-soft),
         0 18px 40px rgba(0, 0, 0, 0.55);
 
+    // One tile, and one pixel of its 16 x 16 art, for sizing anything that scales with the map
+    .ge-board-tiles,
+    .ge-board-layer {
+        --tile: calc(100cqw / var(--cols));
+        --px: calc(var(--tile) / 16);
+    }
+
     .ge-board-tiles {
         display: grid;
         grid-template-columns: repeat(var(--cols), 1fr);
@@ -26,7 +33,6 @@
         position: absolute;
         inset: 0;
         pointer-events: none;
-        // One tile, for sizing text and icons that scale with the map
-        --tile: calc(100cqw / var(--cols));
+        font-family: var(--font-pixel), ui-monospace, monospace;
     }
 }

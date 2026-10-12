@@ -1,10 +1,13 @@
+@use "../../styles/pixel";
+
+// The cursor: four corner brackets, two pixels thick and outlined, that pulse in a beat
 .ge-cursor {
     position: absolute;
     width: calc(100% / var(--cols));
     height: calc(100% / var(--rows));
     z-index: 5;
-    transition: left 70ms ease-out, top 70ms ease-out;
-    animation: ge-cursor-pulse 0.8s ease-in-out infinite alternate;
+    transition: left 70ms steps(2, end), top 70ms steps(2, end);
+    animation: ge-cursor-pulse 0.8s steps(1, end) infinite;
 
     --cursor: #fff4c8;
 
@@ -14,24 +17,29 @@
 
     span {
         position: absolute;
-        width: 32%;
-        height: 32%;
+        width: calc(var(--px) * 5);
+        height: calc(var(--px) * 5);
         border: 0 solid var(--cursor);
-        border-width: max(2px, calc(var(--tile) * 0.08));
-        filter: drop-shadow(0 0 2px rgba(0, 0, 0, 0.8));
+        border-width: calc(var(--px) * 2);
+        filter:
+            drop-shadow(var(--px) 0 0 #1b1a26)
+            drop-shadow(calc(var(--px) * -1) 0 0 #1b1a26)
+            drop-shadow(0 var(--px) 0 #1b1a26)
+            drop-shadow(0 calc(var(--px) * -1) 0 #1b1a26);
 
-        &:nth-child(1) { top: -6%; left: -6%; border-right: 0; border-bottom: 0; border-top-left-radius: 4px; }
-        &:nth-child(2) { top: -6%; right: -6%; border-left: 0; border-bottom: 0; border-top-right-radius: 4px; }
-        &:nth-child(3) { bottom: -6%; left: -6%; border-right: 0; border-top: 0; border-bottom-left-radius: 4px; }
-        &:nth-child(4) { bottom: -6%; right: -6%; border-left: 0; border-top: 0; border-bottom-right-radius: 4px; }
+        &:nth-child(1) { top: calc(var(--px) * -1); left: calc(var(--px) * -1); border-right: 0; border-bottom: 0; }
+        &:nth-child(2) { top: calc(var(--px) * -1); right: calc(var(--px) * -1); border-left: 0; border-bottom: 0; }
+        &:nth-child(3) { bottom: calc(var(--px) * -1); left: calc(var(--px) * -1); border-right: 0; border-top: 0; }
+        &:nth-child(4) { bottom: calc(var(--px) * -1); right: calc(var(--px) * -1); border-left: 0; border-top: 0; }
     }
 }
 
 @keyframes ge-cursor-pulse {
-    from { transform: scale(1); }
-    to { transform: scale(0.9); }
+    0% { transform: scale(1); }
+    50% { transform: scale(0.875); }
 }
 
+// The path: a blocky line along tile centres, four art pixels wide with a one-pixel outline
 .ge-path-arrow {
     position: absolute;
     inset: 0;
@@ -39,18 +47,23 @@
     height: 100%;
     z-index: 1;
     overflow: visible;
+    shape-rendering: crispEdges;
 
     polyline {
         fill: none;
-        stroke-linecap: round;
-        stroke-linejoin: round;
+        stroke-linecap: square;
+        stroke-linejoin: miter;
     }
 
     .ge-path-outline {
-        stroke: rgba(10, 20, 50, 0.75);
-        stroke-width: 0.36;
-        fill: rgba(10, 20, 50, 0.75);
-        stroke-linejoin: round;
+        stroke: #1b1a26;
+        stroke-width: 0.375;
+        fill: #1b1a26;
+        stroke-linejoin: miter;
+    }
+
+    polygon.ge-path-outline {
+        stroke-width: 0.125;
     }
 
     polyline.ge-path-outline {
@@ -59,7 +72,7 @@
 
     .ge-path-fill {
         stroke: #fff2b3;
-        stroke-width: 0.2;
+        stroke-width: 0.25;
     }
 
     .ge-path-head {
@@ -77,27 +90,23 @@
     z-index: 6;
 
     span {
+        @include pixel.outlined-text;
         margin-top: -10%;
-        font-weight: 800;
-        font-size: max(12px, calc(var(--tile) * 0.42));
-        letter-spacing: 0.02em;
-        color: #fff;
+        font-weight: 500;
+        font-size: max(12px, calc(var(--px) * 8));
         white-space: nowrap;
-        text-shadow:
-            0 2px 0 rgba(0, 0, 0, 0.7),
-            0 0 6px rgba(0, 0, 0, 0.6);
-        animation: ge-float-rise 1s ease-out forwards;
+        animation: ge-float-rise 1s steps(10, end) forwards;
     }
 
     &--crit span {
         color: #ffe066;
-        font-size: max(15px, calc(var(--tile) * 0.58));
+        font-size: max(15px, calc(var(--px) * 10));
         animation-name: ge-float-pop;
     }
 
     &--miss span {
         color: #c9d3e8;
-        font-size: max(11px, calc(var(--tile) * 0.34));
+        font-size: max(11px, calc(var(--px) * 6));
     }
 
     &--poison span {
@@ -107,10 +116,9 @@
     &--break span,
     &--info span {
         color: #ffb066;
-        font-size: max(10px, calc(var(--tile) * 0.3));
+        font-size: max(10px, calc(var(--px) * 5.5));
     }
 }
-
 @keyframes ge-float-rise {
     0% { transform: translateY(20%) scale(0.7); opacity: 0; }
     15% { transform: translateY(-10%) scale(1.15); opacity: 1; }

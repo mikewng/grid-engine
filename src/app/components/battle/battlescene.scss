@@ -1,0 +1,210 @@
+// The battle screen. Lives inside GridComponent's overlay layer, over the whole map.
+// The field is a canvas (battlefield.ts); the windows are HTML on the same pixel grid, with --px set to one art pixel.
+@use "../../styles/pixel";
+
+.ge-battle-scene {
+    // Each side's colours, for its windows
+    .faction-p1 { --f-main: #4672e0; --f-dark: #283f9c; }
+    .faction-enemy { --f-main: #d9473f; --f-dark: #8e2229; }
+    .faction-p2 { --f-main: #3ba862; --f-dark: #1e6a3b; }
+    .faction-neutral { --f-main: #d8a033; --f-dark: #8d6216; }
+
+    position: absolute;
+    inset: 0;
+    z-index: 9;
+    overflow: hidden;
+    pointer-events: none;
+
+    > div {
+        position: absolute;
+        inset: 0;
+    }
+
+    .ge-bs-dim {
+        inset: auto;
+        box-shadow: 0 0 0 200vmax rgba(4, 6, 16, 0.38);
+    }
+
+    .ge-bs-black {
+        background: #000;
+    }
+
+    .ge-bs-field {
+        position: absolute;
+        left: 0;
+        top: 0;
+        image-rendering: pixelated;
+    }
+
+    .ge-bs-white {
+        background: #fff;
+        opacity: 0.85;
+    }
+}
+
+.ge-battle-scene .ge-bs-shake > .ge-bs-names {
+    position: absolute;
+    top: calc(var(--px) * 4);
+    left: calc(var(--px) * 4);
+    right: calc(var(--px) * 4);
+    display: flex;
+    justify-content: space-between;
+
+    // Pixelify Sans fills in at heavier weights this small, so the windows stay at 500
+    .ge-bs-name {
+        @include pixel.window(var(--f-main), var(--f-dark));
+        min-width: 30%;
+        padding: calc(var(--px) * 4) calc(var(--px) * 10);
+        font-weight: 500;
+        line-height: 1;
+        text-align: center;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+}
+
+.ge-battle-scene .ge-bs-shake > .ge-bs-gauge {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+}
+
+.ge-bs-gauge-side {
+    @include pixel.window(color-mix(in srgb, var(--f-main) 70%, #0b1430), color-mix(in srgb, var(--f-dark) 80%, #050a1a));
+    display: flex;
+    align-items: stretch;
+    gap: calc(var(--px) * 4);
+    min-width: 0;
+    padding: calc(var(--px) * 5) calc(var(--px) * 6);
+    line-height: 1;
+
+    &.is-right {
+        flex-direction: row-reverse;
+
+        .ge-bs-gauge-main { align-items: flex-end; }
+        .ge-bs-weapon, .ge-bs-hp { flex-direction: row-reverse; }
+    }
+
+    .ge-bs-stats {
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-around;
+        padding: calc(var(--px) * 2) calc(var(--px) * 4);
+        background: rgba(0, 0, 0, 0.3);
+        box-shadow: inset 0 0 0 var(--px) rgba(0, 0, 0, 0.45);
+
+        div {
+            display: flex;
+            justify-content: space-between;
+            gap: calc(var(--px) * 4);
+        }
+
+        dt {
+            font-size: 0.8em;
+            font-weight: 500;
+            color: var(--ge-gold);
+            align-self: center;
+        }
+
+        dd {
+            margin: 0;
+            display: flex;
+            justify-content: flex-end;
+            min-width: calc(var(--px) * 13);
+        }
+    }
+
+    .ge-bs-gauge-main {
+        flex: 1;
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-around;
+    }
+
+    .ge-bs-weapon {
+        display: flex;
+        align-items: center;
+        gap: calc(var(--px) * 3);
+        min-width: 0;
+    }
+
+    // Item icons are 16 x 16, like the game's
+    .ge-bs-weapon-icon {
+        flex: none;
+        width: calc(var(--px) * 18);
+        height: calc(var(--px) * 18);
+        display: grid;
+        place-items: center;
+        background: rgba(0, 0, 0, 0.35);
+
+        svg { width: calc(var(--px) * 16); height: calc(var(--px) * 16); }
+
+        &.is-effective { background: var(--ge-warn); }
+    }
+
+    .ge-bs-weapon-name {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .ge-bs-triangle {
+        font-size: 0.8em;
+        &.is-up { color: #8ef0a8; }
+        &.is-down { color: #ff9c9c; }
+    }
+
+    .ge-bs-hp {
+        display: flex;
+        align-items: center;
+        gap: calc(var(--px) * 4);
+    }
+
+    // The number doubles in height while HP drains, as EkrGauge draws it
+    .ge-bs-hp-number {
+        flex: none;
+
+        &.is-pulsing { scale: 1 2; }
+    }
+
+    .ge-bs-ticks {
+        flex: none;
+        max-width: 100%;
+
+        rect { fill: #1b1a26; }
+        rect.is-full { fill: #f4e27a; }
+
+        &.is-flashing rect.is-full { fill: #fff; }
+    }
+}
+
+.ge-battle-scene > .ge-bs-popup {
+    @include pixel.window(#3a5a9a, #1f2f58);
+    inset: auto;
+    top: 18%;
+    left: 50%;
+    translate: -50% 0;
+    display: flex;
+    align-items: center;
+    gap: calc(var(--px) * 4);
+    padding: calc(var(--px) * 6) calc(var(--px) * 10);
+    font-weight: 500;
+    white-space: nowrap;
+
+    svg {
+        width: calc(var(--px) * 16);
+        height: calc(var(--px) * 16);
+    }
+}
+
+// The skip button moves out of the way of the name windows
+.ge-battle-scene ~ .ge-skip {
+    top: auto;
+    bottom: calc(30% + 0.5rem);
+}

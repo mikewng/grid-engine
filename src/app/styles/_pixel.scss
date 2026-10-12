@@ -1,0 +1,37 @@
+// Pixel art helpers for the windows over the map and in battle.
+// --px is one pixel of the art: a sixteenth of a map tile, or one pixel of the battle screen.
+
+$ink: #1b1a26;
+$frame: #f4f1e8;
+
+/// One art pixel, falling back to 2px outside the map.
+$px: var(--px, 2px);
+
+/// A window drawn like the GBA's: a light frame between dark edges, the corner
+/// pixels nipped off, and the colour in hard bands rather than a smooth gradient.
+@mixin window($top, $bottom) {
+    color: #fff;
+    border: 0;
+    border-radius: 0;
+    background: linear-gradient(180deg,
+        #{$top} 0 30%,
+        color-mix(in srgb, #{$top} 50%, #{$bottom}) 30% 62%,
+        #{$bottom} 62% 100%);
+    box-shadow:
+        inset 0 0 0 $px $ink,
+        inset 0 0 0 calc(#{$px} * 2) $frame,
+        inset 0 0 0 calc(#{$px} * 3) $ink;
+    clip-path: polygon(
+        $px 0, calc(100% - #{$px}) 0, 100% $px, 100% calc(100% - #{$px}),
+        calc(100% - #{$px}) 100%, $px 100%, 0 calc(100% - #{$px}), 0 $px
+    );
+    text-shadow: $px $px 0 rgba(0, 0, 0, 0.55);
+}
+
+/// Text with a one-pixel dark outline, for words floating over the map.
+@mixin outlined-text($color: #fff) {
+    color: $color;
+    text-shadow:
+        $px 0 0 $ink, calc(#{$px} * -1) 0 0 $ink, 0 $px 0 $ink, 0 calc(#{$px} * -1) 0 $ink,
+        $px $px 0 $ink, calc(#{$px} * -1) $px 0 $ink, $px calc(#{$px} * -1) 0 $ink, calc(#{$px} * -1) calc(#{$px} * -1) 0 $ink;
+}

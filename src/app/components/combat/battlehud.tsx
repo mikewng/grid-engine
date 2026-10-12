@@ -1,6 +1,7 @@
 import { CombatSideStats } from "@/engine/rules/combatresolver";
 import { hpTone } from "@/app/components/unit/unittoken";
 import { factionClass } from "@/app/components/unit/faction";
+import { PixelText } from "@/app/components/pixel/pixeltext";
 import { Fighter, FighterPlate } from "./combatui";
 import "./combatui.scss"
 
@@ -24,7 +25,7 @@ const Side = ({ fighter, stats, hp, active, align }: { fighter: Fighter; stats: 
         <div className={`ge-battle-side ${factionClass(fighter.faction)}${active ? " is-active" : ""}`}>
             <FighterPlate fighter={fighter} side={stats} align={align} />
             <div className="ge-battle-hp">
-                <span className="ge-battle-hp-value">{hp}</span>
+                <PixelText className="ge-battle-hp-value" text={String(hp)} />
                 <div className="ge-battle-hp-bar">
                     <span className={`hp-${hpTone(hp, fighter.maxHp)}`} style={{ width: `${percent}%` }} />
                 </div>

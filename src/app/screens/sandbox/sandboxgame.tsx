@@ -11,6 +11,8 @@ import UnitToken from '@/app/components/unit/unittoken';
 import UnitStatsUI from '@/app/components/unit/unitstatsui';
 import CombatUI, { Fighter } from '@/app/components/combat/combatui';
 import BattleHud from '@/app/components/combat/battlehud';
+import BattleScene, { BattleFighter } from '@/app/components/battle/battlescene';
+import { attackerSide, buildBattleScript } from '@/app/components/battle/battlescript';
 import { FloatingTexts, MapCursor, PathArrow } from '@/app/components/map/mapoverlays';
 import { factionName } from '@/app/components/unit/faction';
 import GeneralDebugger from './components/uidebug/generaldebugger';
@@ -34,12 +36,20 @@ const TONES: Record<UnitFaction, BannerInfo["tone"]> = {
     [UnitFaction.NEUTRAL]: "neutral",
 };
 
-function playbackContext({ unitManager, gameManager }: GameManagers): PlaybackContext {
+/** @param battleScenes play fights on the battle screen, rather than on the map */
+function playbackContext({ unitManager, gameManager }: GameManagers, battleScenes: boolean): PlaybackContext {
     return {
         banner: (faction, turn) => ({ title: `${factionName(faction)} Phase`, subtitle: `Turn ${turn}`, tone: TONES[faction] }),
         isAi: (unitId) => {
             const unit = unitManager.getUnitById(unitId).value;
             return !!unit && gameManager.controllerOf(unit.unitFaction) === "ai";
+        },
+        battleScene: ({ attackerId, defenderId, outcome }) => {
+            const attacker = unitManager.getUnitById(attackerId).value;
+            const defender = unitManager.getUnitById(defenderId).value;
+            if (!battleScenes || !attacker || !defender) return null;
+
+            return buildBattleScript({ outcome, attackerSide: attackerSide(attacker.unitFaction, defender.unitFaction) });
         },
     };
 }
@@ -66,6 +76,7 @@ const SandboxView = ({ config, managers, gameState, updateGameState, resetGame }
     const [dangerZone, setDangerZone] = useState(false);
     const [autoEnd, setAutoEnd] = useState(true);
     const [fast, setFast] = useState(false);
+    const [battleScenes, setBattleScenes] = useState(true);
 
     const playback = usePlayback(fast ? 0.45 : 1);
     const { play, skip, playing } = playback;
@@ -161,7 +172,7 @@ const SandboxView = ({ config, managers, gameState, updateGameState, resetGame }
         }
 
         setNotice(null);
-        if (result.value.length > 0) void play(result.value, before, playbackContext(managers));
+        if (result.value.length > 0) void play(result.value, before, playbackContext(managers, battleScenes));
         return true;
     };
 
@@ -322,8 +333,9 @@ const SandboxView = ({ config, managers, gameState, updateGameState, resetGame }
         const state = managers.gameManager.getState();
         if (state.isOver) return;
 
+        // Only a banner plays here, so there are no fights to show
         const opening: GameEvent[] = [{ type: 'turnStarted', turn: state.turn, faction: state.activeFaction }];
-        void play(opening, snapshotUnits(managers.unitManager.getAllUnits().value!), playbackContext(managers));
+        void play(opening, snapshotUnits(managers.unitManager.getAllUnits().value!), playbackContext(managers, false));
 
         return skip;
     }, [managers, play, skip]);
@@ -369,6 +381,22 @@ const SandboxView = ({ config, managers, gameState, updateGameState, resetGame }
     const battle = playback.battle;
     const battleAttacker = battle ? unitById(battle.attackerId) : undefined;
     const battleDefender = battle ? unitById(battle.defenderId) : undefined;
+
+    // On the battle screen, the two fighters stand in for their tokens
+    const scene = playback.scene;
+    const sceneAttacker = scene ? unitById(scene.attackerId) : undefined;
+    const sceneDefender = scene ? unitById(scene.defenderId) : undefined;
+    const inScene = (unit: IUnit) => !!scene && (unit.id === scene.attackerId || unit.id === scene.defenderId);
+
+    const battleFighter = (unit: IUnit, tile: Coordinate): BattleFighter => ({
+        id: unit.id,
+        name: unit.name,
+        faction: unit.unitFaction,
+        movement: unit.unitClass.movementType,
+        maxHp: unit.stats.maxHealth,
+        tile,
+        terrain: grid.gridcontent[tile.y][tile.x].type,
+    });
 
     const inspected = hoveredUnit ?? pinnedUnit ?? selectedUnit;
     const inspectedStatus = inspected && inspected.unitFaction === turn.activeFaction && inspected.isAlive
@@ -424,7 +452,7 @@ const SandboxView = ({ config, managers, gameState, updateGameState, resetGame }
                     >
                         <PathArrow cols={grid.width} rows={grid.height} points={path} />
 
-                        {tokens.map(token => (
+                        {tokens.filter(token => !inScene(token.unit)).map(token => (
                             <UnitToken
                                 key={token.unit.id}
                                 x={token.x}
@@ -432,10 +460,11 @@ const SandboxView = ({ config, managers, gameState, updateGameState, resetGame }
                                 name={token.unit.name}
                                 faction={token.unit.unitFaction}
                                 weaponType={token.unit.equippedWeapon?.weaponType}
+                                movement={token.unit.unitClass.movementType}
+                                seed={token.unit.id}
                                 hp={token.hp}
                                 maxHp={token.unit.stats.maxHealth}
                                 acted={token.acted}
-                                ready={canAct && token.unit.unitFaction === turn.activeFaction && !token.acted}
                                 selected={!playing && token.unit.id === selectedUnit?.id}
                                 lunge={motion.lunge?.unitId === token.unit.id ? motion.lunge : undefined}
                                 hurt={motion.hurt?.unitId === token.unit.id ? motion.hurt.kind : undefined}
@@ -472,6 +501,19 @@ const SandboxView = ({ config, managers, gameState, updateGameState, resetGame }
                             />
                         )}
 
+                        {scene && sceneAttacker && sceneDefender && (
+                            <BattleScene
+                                key={scene.startedAt}
+                                script={scene.script}
+                                attacker={battleFighter(sceneAttacker, scene.attackerAt)}
+                                defender={battleFighter(sceneDefender, scene.defenderAt)}
+                                cols={grid.width}
+                                rows={grid.height}
+                                startedAt={scene.startedAt}
+                                speed={scene.speed}
+                            />
+                        )}
+
                         {playback.banner && <PhaseBanner banner={playback.banner} />}
                         {playing && <SkipButton onSkip={skip} />}
                         {notice && <Toast key={notice.id} text={notice.text} />}
@@ -490,11 +532,13 @@ const SandboxView = ({ config, managers, gameState, updateGameState, resetGame }
                         dangerZone={dangerZone}
                         autoEnd={autoEnd}
                         fast={fast}
+                        battleScenes={battleScenes}
                         onEndTurn={endTurn}
                         onReset={restart}
                         onToggleDangerZone={() => setDangerZone(on => !on)}
                         onToggleAutoEnd={() => setAutoEnd(on => !on)}
                         onToggleFast={() => setFast(on => !on)}
+                        onToggleBattleScenes={() => setBattleScenes(on => !on)}
                     />
 
                     {forecast && selectedUnit && forecastTarget && !playing && (
