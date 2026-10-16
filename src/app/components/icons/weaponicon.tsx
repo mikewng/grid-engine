@@ -172,10 +172,19 @@ const paletteOf = (type: WeaponType | undefined): Palette => (type === WeaponTyp
     ? { ...BASE, T: COLORS.tomeLight, D: "#c9b77a" }
     : { ...BASE, T: COLORS.tomeAnima, D: "#7e2a1c" });
 
+const iconPaths = new Map<WeaponType | "none", { color: string; d: string }[]>();
+
+/** An icon's outlined pixels as SVG paths, worked out once per weapon type. */
+function pathsFor(type: WeaponType | undefined) {
+    const key = type ?? "none";
+    if (!iconPaths.has(key)) iconPaths.set(key, paths(outline(ICONS[key]), paletteOf(type)));
+    return iconPaths.get(key)!;
+}
+
 /** A small pixel icon for each weapon type. */
 const WeaponIcon = ({ type, className }: WeaponIconProps) => (
     <svg className={className} viewBox="0 0 16 16" shapeRendering="crispEdges" aria-hidden="true">
-        {paths(outline(ICONS[type ?? "none"]), paletteOf(type)).map(({ color, d }) => <path key={color} fill={color} d={d} />)}
+        {pathsFor(type).map(({ color, d }) => <path key={color} fill={color} d={d} />)}
     </svg>
 );
 

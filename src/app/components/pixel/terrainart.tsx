@@ -1,5 +1,5 @@
 import { TileType } from "@/engine/models/grid/itile";
-import { cssUrl, Palette, Pixels, pixels, shift } from "./pixelart";
+import { Palette, paths, Pixels, pixels, shift } from "./pixelart";
 
 // The map's terrain as 16 x 16 pixel tiles. Each tile is a base colour with
 // small motifs stamped on top, so the variations stay easy to tweak.
@@ -219,31 +219,15 @@ export const TERRAIN_TILES: Record<TileType, { palette: Palette; variants: Pixel
     [TileType.Village]: { palette: VILLAGE, variants: [village] },
 };
 
-const tileClass = (type: TileType) => `.ge-tile--${TileType[type].toLowerCase()}`;
+const swatchPaths = new Map<TileType, { color: string; d: string }[]>();
 
-/** Background images for every tile class, and water's two-frame ripple. */
-const TERRAIN_CSS = (() => {
-    const rules: string[] = [];
-    const url = (type: TileType, variant: number) => cssUrl(TERRAIN_TILES[type].variants[variant], TERRAIN_TILES[type].palette);
+/** One tile's art as crisp SVG, for showing terrain off the map (the terrain card). */
+export const TerrainSwatch = ({ type, className }: { type: TileType; className?: string }) => {
+    if (!swatchPaths.has(type)) swatchPaths.set(type, paths(TERRAIN_TILES[type].variants[0], TERRAIN_TILES[type].palette));
 
-    grass.forEach((_, variant) => rules.push(`${tileClass(TileType.Grass)}.ge-tile--v${variant}{background-image:${url(TileType.Grass, variant)}}`));
-    rules.push(`${tileClass(TileType.Grass)}{background-image:${url(TileType.Grass, 0)}}`);
-
-    for (const type of [TileType.Forest, TileType.Mountain, TileType.Block, TileType.Road, TileType.Bridge, TileType.Fort, TileType.Sand, TileType.Village]) {
-        rules.push(`${tileClass(type)}{background-image:${url(type, 0)}}`);
-    }
-
-    rules.push(`${tileClass(TileType.Water)}{background-image:${url(TileType.Water, 0)};animation:ge-water-px 1.4s steps(1,end) infinite}`);
-    rules.push(`@keyframes ge-water-px{0%{background-image:${url(TileType.Water, 0)}}50%,100%{background-image:${url(TileType.Water, 1)}}}`);
-    rules.push(`@media (prefers-reduced-motion:reduce){.ge-tile${tileClass(TileType.Water)}{animation:none}}`);
-
-    return rules.join("\n");
-})();
-
-/**
- * The terrain art, as a stylesheet. React puts it in the page once however many
- * times it's rendered, so anything that draws tiles can include it.
- */
-export const TerrainStyles = () => (
-    <style href="ge-terrain-art" precedence="default">{TERRAIN_CSS}</style>
-);
+    return (
+        <svg className={className} viewBox={`0 0 ${SIZE} ${SIZE}`} shapeRendering="crispEdges" aria-hidden="true">
+            {swatchPaths.get(type)!.map(({ color, d }) => <path key={color} fill={color} d={d} />)}
+        </svg>
+    );
+};

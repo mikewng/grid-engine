@@ -1,6 +1,6 @@
 @use "../../styles/pixel";
 
-// The cursor: four corner brackets, two pixels thick and outlined, that pulse in a beat
+// The cursor: corner brackets that pulse in a beat. The sprite is 20 pixels for a 16-pixel tile.
 .ge-cursor {
     position: absolute;
     width: calc(100% / var(--cols));
@@ -9,28 +9,13 @@
     transition: left 70ms steps(2, end), top 70ms steps(2, end);
     animation: ge-cursor-pulse 0.8s steps(1, end) infinite;
 
-    --cursor: #fff4c8;
-
-    &--attack {
-        --cursor: #ff8a7a;
-    }
-
-    span {
+    svg {
         position: absolute;
-        width: calc(var(--px) * 5);
-        height: calc(var(--px) * 5);
-        border: 0 solid var(--cursor);
-        border-width: calc(var(--px) * 2);
-        filter:
-            drop-shadow(var(--px) 0 0 #1b1a26)
-            drop-shadow(calc(var(--px) * -1) 0 0 #1b1a26)
-            drop-shadow(0 var(--px) 0 #1b1a26)
-            drop-shadow(0 calc(var(--px) * -1) 0 #1b1a26);
-
-        &:nth-child(1) { top: calc(var(--px) * -1); left: calc(var(--px) * -1); border-right: 0; border-bottom: 0; }
-        &:nth-child(2) { top: calc(var(--px) * -1); right: calc(var(--px) * -1); border-left: 0; border-bottom: 0; }
-        &:nth-child(3) { bottom: calc(var(--px) * -1); left: calc(var(--px) * -1); border-right: 0; border-top: 0; }
-        &:nth-child(4) { bottom: calc(var(--px) * -1); right: calc(var(--px) * -1); border-left: 0; border-top: 0; }
+        left: -12.5%;
+        top: -12.5%;
+        width: 125%;
+        height: 125%;
+        overflow: visible;
     }
 }
 

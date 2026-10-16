@@ -1,5 +1,5 @@
 'use client'
-import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { GameConfig, GameState, useGame } from '@/app/context/gamecontext';
 import { GameManagers } from '@/engine/gamesetup';
 import { Tile } from '@/engine/models/grid/tile';
@@ -84,7 +84,7 @@ const SandboxView = ({ config, managers, gameState, updateGameState, resetGame, 
     const playback = usePlayback(fast ? 0.45 : 1);
     const { play, skip, playing } = playback;
 
-    const { gridManager, unitManager, movementManager, combatManager, gameManager, ruleset } = managers;
+    const { gridManager, unitManager, movementManager, combatManager, gameManager } = managers;
     const grid = gridManager.getGrid().value!;
     const turn = gameManager.getState();
     const history = gameManager.getHistory();
@@ -112,47 +112,64 @@ const SandboxView = ({ config, managers, gameState, updateGameState, resetGame, 
         : config.scenario.turnOrder.find(faction => gameManager.controllerOf(faction) === 'human') ?? UnitFaction.P1;
 
     // --- Overlays, all worked out by the engine ---
-    let moveTiles = EMPTY;
-    let attackTiles = EMPTY;
-    let targetTiles = EMPTY;
-    let path: Coordinate[] = [];
-    let targets: IUnit[] = [];
 
-    if (!playing && !turn.isOver) {
-        if (selectedUnit && phase === 'move') {
-            const threat = threatOf(managers, selectedUnit.id);
-            moveTiles = threat.move;
-            attackTiles = threat.attackFringe;
+    // The engine changes its state in place; its version says when it has
+    const version = gameManager.getVersion();
+    const showRanges = !playing && !turn.isOver;
+    const selectedId = selectedUnit?.id;
 
-            if (hovered && moveTiles.has(coordinateKey(hovered))) {
-                path = [selectedUnit.position, ...(movementManager.findPath(selectedUnit.id, hovered).value ?? [])];
-            }
-        } else if (selectedUnit && (phase === 'action' || phase === 'target')) {
-            targets = combatManager.getAttackableTargets(selectedUnit.id).value ?? [];
-            attackTiles = keys(combatManager.getAttackRange(selectedUnit.id).value ?? []);
-            targetTiles = keys(targets.map(target => target.position));
-        } else if (phase === 'select') {
-            // Preview a unit's reach: the one clicked on, or else the one under the pointer.
-            // Units that are done for the turn aren't going anywhere, so they don't get one.
-            const preview = pinnedUnit ?? hoveredUnit;
+    // In the select step, preview a unit's reach: the one clicked on, or else the one under the pointer.
+    // Units that are done for the turn aren't going anywhere, so they don't get one.
+    const preview = phase === 'select' ? pinnedUnit ?? hoveredUnit : undefined;
+    const previewId = preview && !(preview.unitFaction === turn.activeFaction && preview.hasActed) ? preview.id : undefined;
 
-            if (preview && !(preview.unitFaction === turn.activeFaction && preview.hasActed)) {
-                const threat = threatOf(managers, preview.id);
-                moveTiles = threat.move;
-                attackTiles = threat.attackFringe;
+    // Worked out again when the selection, the previewed unit or the game changes, not every time the pointer moves
+    const { moveTiles, attackTiles, targetTiles, targets } = useMemo(() => {
+        const none = { moveTiles: EMPTY, attackTiles: EMPTY, targetTiles: EMPTY, targets: [] as IUnit[] };
+        if (!showRanges) return none;
+
+        if (selectedId && phase === 'move') {
+            const threat = threatOf(managers, selectedId);
+            return { ...none, moveTiles: threat.move, attackTiles: threat.attackFringe };
+        }
+
+        if (selectedId && (phase === 'action' || phase === 'target')) {
+            const reachable = managers.combatManager.getAttackableTargets(selectedId).value ?? [];
+            return {
+                ...none,
+                attackTiles: keys(managers.combatManager.getAttackRange(selectedId).value ?? []),
+                targetTiles: keys(reachable.map(target => target.position)),
+                targets: reachable,
+            };
+        }
+
+        if (previewId) {
+            const threat = threatOf(managers, previewId);
+            return { ...none, moveTiles: threat.move, attackTiles: threat.attackFringe };
+        }
+
+        return none;
+        // eslint-disable-next-line react-hooks/exhaustive-deps -- the engine changes in place; version is what tells us it did
+    }, [managers, version, showRanges, phase, selectedId, previewId]);
+
+    const dangerTiles = useMemo(() => {
+        const tiles = new Set<string>();
+        if (!dangerZone) return tiles;
+
+        for (const unit of managers.unitManager.getAllUnits().value!) {
+            if (unit.isAlive && managers.ruleset.factions.areHostile(viewer, unit.unitFaction)) {
+                for (const key of threatOf(managers, unit.id).attackable) tiles.add(key);
             }
         }
-    }
 
-    const dangerTiles = new Set<string>();
+        return tiles;
+        // eslint-disable-next-line react-hooks/exhaustive-deps -- the engine changes in place; version is what tells us it did
+    }, [managers, version, dangerZone, viewer]);
 
-    if (dangerZone) {
-        for (const unit of allUnits) {
-            if (unit.isAlive && ruleset.factions.areHostile(viewer, unit.unitFaction)) {
-                for (const key of threatOf(managers, unit.id).attackable) dangerTiles.add(key);
-            }
-        }
-    }
+    // The path preview follows the pointer, so it's the one thing worked out on every move
+    const path: Coordinate[] = selectedUnit && phase === 'move' && hovered && moveTiles.has(coordinateKey(hovered))
+        ? [selectedUnit.position, ...(movementManager.findPath(selectedUnit.id, hovered).value ?? [])]
+        : [];
 
     // --- Forecast: the hovered target, or the one picked ---
     const hoveredTarget = hovered ? targets.find(target => samePlace(target.position, hovered)) : undefined;
@@ -369,7 +386,9 @@ const SandboxView = ({ config, managers, gameState, updateGameState, resetGame, 
     // --- Drawing ---
     const { visuals, motion } = playback;
 
-    const tokens = allUnits.map(unit => {
+    // Each unit as drawn: where the replay has it while one runs, otherwise where the engine does.
+    // These only change when the game or the replay moves on, so moving the pointer reuses them.
+    const tokens = useMemo(() => managers.unitManager.getAllUnits().value!.map(unit => {
         const visual = visuals?.[unit.id];
 
         return {
@@ -381,12 +400,14 @@ const SandboxView = ({ config, managers, gameState, updateGameState, resetGame, 
             acted: visual ? visual.acted : unit.hasActed,
             dying: visual?.dying ?? false,
         };
-    }).filter(token => token.alive || token.dying);
+    }).filter(token => token.alive || token.dying),
+        // eslint-disable-next-line react-hooks/exhaustive-deps -- the engine changes in place; version is what tells us it did
+    [managers, version, visuals]);
 
-    const occupants = new Map(tokens.map(token => [
+    const occupants = useMemo(() => new Map(tokens.map(token => [
         coordinateKey(token),
         `${token.unit.name}, ${factionName(token.unit.unitFaction)}, ${token.hp} of ${token.unit.stats.maxHealth} HP`,
-    ]));
+    ])), [tokens]);
 
     const cursorTile = playing ? playback.focus : hovered;
     const battle = playback.battle;
@@ -397,7 +418,28 @@ const SandboxView = ({ config, managers, gameState, updateGameState, resetGame, 
     const scene = playback.scene;
     const sceneAttacker = scene ? unitById(scene.attackerId) : undefined;
     const sceneDefender = scene ? unitById(scene.defenderId) : undefined;
-    const inScene = (unit: IUnit) => !!scene && (unit.id === scene.attackerId || unit.id === scene.defenderId);
+
+    const tokenElements = useMemo(() => tokens
+        .filter(token => !scene || (token.unit.id !== scene.attackerId && token.unit.id !== scene.defenderId))
+        .map(token => (
+            <UnitToken
+                key={token.unit.id}
+                x={token.x}
+                y={token.y}
+                name={token.unit.name}
+                faction={token.unit.unitFaction}
+                weaponType={token.unit.equippedWeapon?.weaponType}
+                movement={token.unit.unitClass.movementType}
+                seed={token.unit.id}
+                hp={token.hp}
+                maxHp={token.unit.stats.maxHealth}
+                acted={token.acted}
+                selected={!playing && token.unit.id === selectedId}
+                lunge={motion.lunge?.unitId === token.unit.id ? motion.lunge : undefined}
+                hurt={motion.hurt?.unitId === token.unit.id ? motion.hurt.kind : undefined}
+                dying={token.dying}
+            />
+        )), [tokens, scene, playing, selectedId, motion]);
 
     const battleFighter = (unit: IUnit, tile: Coordinate): BattleFighter => ({
         id: unit.id,
@@ -417,7 +459,7 @@ const SandboxView = ({ config, managers, gameState, updateGameState, resetGame, 
     const terrainTile = hovered ?? selectedUnit?.position;
     const terrain = terrainTile ? gridManager.getTerrainAt(terrainTile.x, terrainTile.y).value : undefined;
 
-    const lastCombat = [...history].reverse().find((event): event is Extract<GameEvent, { type: "combat" }> => event.type === "combat");
+    const lastCombat = history.findLast((event): event is Extract<GameEvent, { type: "combat" }> => event.type === "combat");
 
     const victory = turn.winner !== null && gameManager.controllerOf(turn.winner) === 'human';
 
@@ -468,28 +510,11 @@ const SandboxView = ({ config, managers, gameState, updateGameState, resetGame, 
                         dangerTiles={dangerTiles}
                         targetTiles={targetTiles}
                         occupants={occupants}
+                        cursor={hovered}
                     >
                         <PathArrow cols={grid.width} rows={grid.height} points={path} />
 
-                        {tokens.filter(token => !inScene(token.unit)).map(token => (
-                            <UnitToken
-                                key={token.unit.id}
-                                x={token.x}
-                                y={token.y}
-                                name={token.unit.name}
-                                faction={token.unit.unitFaction}
-                                weaponType={token.unit.equippedWeapon?.weaponType}
-                                movement={token.unit.unitClass.movementType}
-                                seed={token.unit.id}
-                                hp={token.hp}
-                                maxHp={token.unit.stats.maxHealth}
-                                acted={token.acted}
-                                selected={!playing && token.unit.id === selectedUnit?.id}
-                                lunge={motion.lunge?.unitId === token.unit.id ? motion.lunge : undefined}
-                                hurt={motion.hurt?.unitId === token.unit.id ? motion.hurt.kind : undefined}
-                                dying={token.dying}
-                            />
-                        ))}
+                        {tokenElements}
 
                         {cursorTile && <MapCursor tile={cursorTile} tone={hoveredTarget && !playing ? 'attack' : 'default'} />}
 

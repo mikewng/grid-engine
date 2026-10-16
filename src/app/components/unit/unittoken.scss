@@ -27,12 +27,18 @@
         overflow: visible;
     }
 
-    // Idle: two frames, taking turns
+    // Idle: two frames, taking turns. The board flips data-idle for everyone at once
+    // (GridComponent); the selected unit bobs faster, on an animation of its own.
     .ge-sprite-frame--1 {
         visibility: hidden;
     }
 
-    &:not(.is-acted) {
+    [data-idle="1"] &:not(.is-acted):not(.is-selected) {
+        .ge-sprite-frame--0 { visibility: hidden; }
+        .ge-sprite-frame--1 { visibility: visible; }
+    }
+
+    &.is-selected {
         .ge-sprite-frame--0 { animation: ge-sprite-a var(--idle) steps(1, end) infinite; }
         .ge-sprite-frame--1 { animation: ge-sprite-b var(--idle) steps(1, end) infinite; }
     }
@@ -141,8 +147,8 @@
         transition: none;
     }
 
-    .ge-token:not(.is-acted) .ge-sprite-frame--0,
-    .ge-token:not(.is-acted) .ge-sprite-frame--1 {
+    .ge-token.is-selected .ge-sprite-frame--0,
+    .ge-token.is-selected .ge-sprite-frame--1 {
         animation: none;
     }
 }

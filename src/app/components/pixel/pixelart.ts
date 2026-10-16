@@ -78,18 +78,6 @@ export function paths(rows: Pixels, palette: Palette): { color: string; d: strin
     return [...byColor].map(([color, runs]) => ({ color, d: runs.join("") }));
 }
 
-/** The sprite as standalone SVG markup. */
-export function svg(rows: Pixels, palette: Palette): string {
-    const body = paths(rows, palette).map(({ color, d }) => `<path fill="${color}" d="${d}"/>`).join("");
-    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${rows[0].length} ${rows.length}" shape-rendering="crispEdges">${body}</svg>`;
-}
-
-/** The sprite as a CSS url(), for background images. */
-export function cssUrl(rows: Pixels, palette: Palette): string {
-    const encoded = svg(rows, palette).replace(/"/g, "'").replace(/#/g, "%23").replace(/</g, "%3C").replace(/>/g, "%3E");
-    return `url("data:image/svg+xml,${encoded}")`;
-}
-
 /** A colour made darker (amount below 1) or lighter (above 1). */
 export function shade(hex: string, amount: number): string {
     const value = parseInt(hex.slice(1), 16);

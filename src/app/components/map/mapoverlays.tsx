@@ -1,5 +1,6 @@
 import { CSSProperties } from "react";
 import { Coordinate } from "@/engine/models/grid/coordinate";
+import { INK, outline, paths, pixels } from "@/app/components/pixel/pixelart";
 
 import "./mapoverlays.scss"
 
@@ -10,10 +11,38 @@ export const tileStyle = (tile: Coordinate): CSSProperties => ({
     top: `calc(${tile.y} * 100% / var(--rows))`,
 });
 
+// Corner brackets two pixels thick, reaching a pixel past a 16-pixel tile, then outlined: 20 x 20 in all
+const CURSOR = outline(pixels(`
+    ....................
+    .#####........#####.
+    .#####........#####.
+    .##..............##.
+    .##..............##.
+    .##..............##.
+    ....................
+    ....................
+    ....................
+    ....................
+    ....................
+    ....................
+    ....................
+    ....................
+    .##..............##.
+    .##..............##.
+    .##..............##.
+    .#####........#####.
+    .#####........#####.
+    ....................
+`));
+
+const CURSOR_COLORS = { default: "#fff4c8", attack: "#ff8a7a" };
+
 /** The pulsing corner brackets around the tile under the pointer. */
 export const MapCursor = ({ tile, tone = "default" }: { tile: Coordinate; tone?: "default" | "attack" }) => (
-    <div className={`ge-cursor ge-cursor--${tone}`} style={tileStyle(tile)} aria-hidden="true">
-        <span /><span /><span /><span />
+    <div className="ge-cursor" style={tileStyle(tile)} aria-hidden="true">
+        <svg viewBox="0 0 20 20" shapeRendering="crispEdges">
+            {paths(CURSOR, { "#": CURSOR_COLORS[tone], k: INK }).map(({ color, d }) => <path key={color} fill={color} d={d} />)}
+        </svg>
     </div>
 );
 
